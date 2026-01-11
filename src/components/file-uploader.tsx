@@ -13,14 +13,19 @@ export function FileUploader({ projectId }: { projectId: string }) {
     <UploadButton
       endpoint="projectFile"
       onBeforeUploadBegin={(files) => {
+        console.log("onBeforeUploadBegin triggered with files:", files);
         setIsUploading(true);
         return files;
       }}
       onClientUploadComplete={async (res) => {
+        console.log("Upload complete, received files:", res);
+
         // Save each uploaded file to the database
         try {
           for (const file of res) {
-            await fetch("/api/files", {
+            console.log("Saving file to database:", file);
+
+            const response = await fetch("/api/files", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -31,8 +36,17 @@ export function FileUploader({ projectId }: { projectId: string }) {
                 fileType: file.type,
               }),
             });
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error("Failed to save file:", errorText);
+              throw new Error(`Failed to save file: ${errorText}`);
+            }
+
+            console.log("File saved successfully");
           }
 
+          console.log("All files saved, refreshing page");
           router.refresh();
           setIsUploading(false);
         } catch (error) {
@@ -42,6 +56,12 @@ export function FileUploader({ projectId }: { projectId: string }) {
         }
       }}
       onUploadError={(error: Error) => {
+        console.error("Upload error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          name: error.name,
+          stack: error.stack,
+        });
         alert(`Upload failed: ${error.message}`);
         setIsUploading(false);
       }}
