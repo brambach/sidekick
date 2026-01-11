@@ -4,9 +4,10 @@ import { projects, clients, files, messages, users } from "@/lib/db/schema";
 import { eq, isNull, and, desc } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, User, Building2, FileText, MessageSquare, Clock, Upload, Download } from "lucide-react";
+import { ArrowLeft, Calendar, User, Building2, FileText, MessageSquare, Clock, Download } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { MessageForm } from "@/components/message-form";
+import { FileUploader } from "@/components/file-uploader";
 
 export const dynamic = "force-dynamic";
 
@@ -172,10 +173,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <FileText className="w-5 h-5" />
                 Files ({projectFiles.length})
               </h2>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                Upload Files
-              </button>
+              <FileUploader projectId={id} />
             </div>
 
             {projectFiles.length === 0 ? (
