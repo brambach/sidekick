@@ -130,6 +130,12 @@ async function seed() {
     twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
     const nextMonth = new Date(now);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const oneDayAgo = new Date(now);
+    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+    const twoDaysAgo = new Date(now);
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    const fiveDaysAgo = new Date(now);
+    fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
     const [project1, project2, project3, project4] = await db
       .insert(projects)
@@ -213,8 +219,6 @@ async function seed() {
     console.log("  - 4 clients (TechCorp, StartupX, RetailCo, DesignCo)");
     console.log("  - 4 users (1 admin, 3 client users)");
     console.log("  - 4 projects (various statuses, including 1 overdue)");
-    console.log("  - 4 demo files");
-    console.log("  - 6 messages across projects");
     console.log("  - 4 client activity records");
     console.log("");
     console.log("Note: DesignCo is an edge case client with:");
