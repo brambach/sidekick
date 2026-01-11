@@ -26,10 +26,9 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.redirect(signInUrl);
   }
 
-  // Get role from session claims (could be in metadata or publicMetadata)
+  // Get role from session claims
   const metadata = (sessionClaims?.metadata as { role?: string }) || {};
-  const publicMetadata = (sessionClaims?.publicMetadata as { role?: string }) || {};
-  const role = metadata.role || publicMetadata.role;
+  const role = metadata.role;
 
   // Protect admin routes
   if (isAdminRoute(req)) {
