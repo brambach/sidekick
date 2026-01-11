@@ -8,6 +8,9 @@ import { ArrowLeft, Calendar, User, Building2, FileText, MessageSquare, Clock, D
 import { format, formatDistanceToNow } from "date-fns";
 import { MessageForm } from "@/components/message-form";
 import { FileUploader } from "@/components/file-uploader";
+import { EditProjectDialog } from "@/components/edit-project-dialog";
+import { UpdateStatusDialog } from "@/components/update-status-dialog";
+import { ProjectQuickActions } from "@/components/project-quick-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -153,12 +156,16 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           </div>
 
           <div className="flex gap-2">
-            <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-md transition-colors text-sm font-medium">
-              Edit Project
-            </button>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
-              Update Status
-            </button>
+            <EditProjectDialog
+              project={{
+                id: project.id,
+                name: project.name,
+                description: project.description,
+                startDate: project.startDate,
+                dueDate: project.dueDate,
+              }}
+            />
+            <UpdateStatusDialog projectId={project.id} currentStatus={project.status} />
           </div>
         </div>
       </div>
@@ -167,7 +174,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Files Section */}
-          <div>
+          <div data-section="files">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -309,20 +316,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-            <p className="text-sm text-blue-900 font-medium mb-2">Quick Actions</p>
-            <div className="space-y-2">
-              <button className="w-full text-left text-sm text-blue-700 hover:text-blue-800 transition-colors">
-                Mark as completed
-              </button>
-              <button className="w-full text-left text-sm text-blue-700 hover:text-blue-800 transition-colors">
-                Upload deliverables
-              </button>
-              <button className="w-full text-left text-sm text-blue-700 hover:text-blue-800 transition-colors">
-                Schedule meeting
-              </button>
-            </div>
-          </div>
+          <ProjectQuickActions projectId={project.id} />
         </div>
       </div>
     </div>
