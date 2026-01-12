@@ -22,6 +22,36 @@ export const projectStatusEnum = pgEnum("project_status", [
   "on_hold",
 ]);
 
+// Ticket enums
+export const ticketStatusEnum = pgEnum("ticket_status", [
+  "open",
+  "in_progress",
+  "waiting_on_client",
+  "resolved",
+  "closed",
+]);
+
+export const ticketPriorityEnum = pgEnum("ticket_priority", [
+  "low",
+  "medium",
+  "high",
+  "urgent",
+]);
+
+export const ticketTypeEnum = pgEnum("ticket_type", [
+  "general_support",
+  "project_issue",
+  "feature_request",
+  "bug_report",
+]);
+
+// Invite enums
+export const inviteStatusEnum = pgEnum("invite_status", [
+  "pending",
+  "accepted",
+  "expired",
+]);
+
 // Users Table (Simplified - Clerk is source of truth for profile data)
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -39,7 +69,7 @@ export const agencies = pgTable("agencies", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   logoUrl: text("logo_url"),
-  primaryColor: varchar("primary_color", { length: 7 }).default("#3B82F6"),
+  primaryColor: varchar("primary_color", { length: 7 }).default("#8B5CF6"),
   domain: varchar("domain", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -140,6 +170,116 @@ export const clientActivity = pgTable("client_activity", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Tickets Table
+export const tickets = pgTable(
+  "tickets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // Core fields
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description").notNull(),
+    type: ticketTypeEnum("type").notNull().default("general_support"),
+    status: ticketStatusEnum("status").notNull().default("open"),
+    priority: ticketPriorityEnum("priority").notNull().default("medium"),
+
+    // Relationships
+    clientId: uuid("client_id")
+      .references(() => clients.id, { onDelete: "cascade" })
+      .notNull(),
+    projectId: uuid("project_id").references(() => projects.id, {
+      onDelete: "set null",
+    }), // Optional - for project-specific tickets
+
+    // Assignment
+    createdBy: uuid("created_by")
+      .references(() => users.id, { onDelete: "set null" })
+      .notNull(),
+    assignedTo: uuid("assigned_to").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    assignedAt: timestamp("assigned_at"),
+
+    // Resolution
+    resolvedAt: timestamp("resolved_at"),
+    resolvedBy: uuid("resolved_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    resolution: text("resolution"), // Summary of how it was resolved
+
+    // External integration
+    linearIssueId: varchar("linear_issue_id", { length: 255 }),
+    linearIssueUrl: varchar("linear_issue_url", { length: 500 }),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (table) => ({
+    clientIdx: index("tickets_client_idx").on(table.clientId),
+    projectIdx: index("tickets_project_idx").on(table.projectId),
+    statusIdx: index("tickets_status_idx").on(table.status),
+    assignedToIdx: index("tickets_assigned_to_idx").on(table.assignedTo),
+  })
+);
+
+// Ticket Comments Table
+export const ticketComments = pgTable(
+  "ticket_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ticketId: uuid("ticket_id")
+      .references(() => tickets.id, { onDelete: "cascade" })
+      .notNull(),
+    authorId: uuid("author_id")
+      .references(() => users.id, { onDelete: "set null" })
+      .notNull(),
+    content: text("content").notNull(),
+    isInternal: boolean("is_internal").notNull().default(false), // Internal notes (client can't see)
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (table) => ({
+    ticketIdx: index("ticket_comments_ticket_idx").on(table.ticketId),
+    authorIdx: index("ticket_comments_author_idx").on(table.authorId),
+  })
+);
+
+// Invites Table (for onboarding team members and clients)
+export const invites = pgTable(
+  "invites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: varchar("email", { length: 255 }).notNull(),
+    token: varchar("token", { length: 255 }).notNull().unique(),
+    role: userRoleEnum("role").notNull(), // What role they'll get
+    status: inviteStatusEnum("status").notNull().default("pending"),
+
+    // For client invites, link to client
+    clientId: uuid("client_id").references(() => clients.id, {
+      onDelete: "cascade",
+    }),
+
+    // Who sent the invite
+    invitedBy: uuid("invited_by")
+      .references(() => users.id, { onDelete: "set null" })
+      .notNull(),
+
+    // Expiration
+    expiresAt: timestamp("expires_at").notNull(),
+    acceptedAt: timestamp("accepted_at"),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    emailIdx: index("invites_email_idx").on(table.email),
+    tokenIdx: index("invites_token_idx").on(table.token),
+    statusIdx: index("invites_status_idx").on(table.status),
+  })
+);
+
 // Relations
 export const usersRelations = relations(users, ({ one }) => ({
   agency: one(agencies, {
@@ -202,5 +342,56 @@ export const clientActivityRelations = relations(clientActivity, ({ one }) => ({
   client: one(clients, {
     fields: [clientActivity.clientId],
     references: [clients.id],
+  }),
+}));
+
+// Ticket Relations
+export const ticketsRelations = relations(tickets, ({ one, many }) => ({
+  client: one(clients, {
+    fields: [tickets.clientId],
+    references: [clients.id],
+  }),
+  project: one(projects, {
+    fields: [tickets.projectId],
+    references: [projects.id],
+  }),
+  creator: one(users, {
+    fields: [tickets.createdBy],
+    references: [users.id],
+    relationName: "ticketCreator",
+  }),
+  assignee: one(users, {
+    fields: [tickets.assignedTo],
+    references: [users.id],
+    relationName: "ticketAssignee",
+  }),
+  resolver: one(users, {
+    fields: [tickets.resolvedBy],
+    references: [users.id],
+    relationName: "ticketResolver",
+  }),
+  comments: many(ticketComments),
+}));
+
+export const ticketCommentsRelations = relations(ticketComments, ({ one }) => ({
+  ticket: one(tickets, {
+    fields: [ticketComments.ticketId],
+    references: [tickets.id],
+  }),
+  author: one(users, {
+    fields: [ticketComments.authorId],
+    references: [users.id],
+  }),
+}));
+
+// Invite Relations
+export const invitesRelations = relations(invites, ({ one }) => ({
+  client: one(clients, {
+    fields: [invites.clientId],
+    references: [clients.id],
+  }),
+  inviter: one(users, {
+    fields: [invites.invitedBy],
+    references: [users.id],
   }),
 }));

@@ -24,6 +24,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    if (!user.agencyId) {
+      return NextResponse.json({ error: "User not associated with an agency" }, { status: 400 });
+    }
+
     const body = await req.json();
     const { companyName, contactName, contactEmail, status = "active" } = body;
 
@@ -36,9 +40,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Create new client
-    const newClient = await db
+    const [newClient] = await db
       .insert(clients)
       .values({
+        agencyId: user.agencyId,
         companyName,
         contactName,
         contactEmail,
@@ -46,7 +51,7 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json(newClient[0], { status: 201 });
+    return NextResponse.json({ client: newClient }, { status: 201 });
   } catch (error) {
     console.error("Error creating client:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

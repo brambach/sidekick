@@ -1,6 +1,8 @@
-# Sidekick - Client Portal Foundation
+# Digital Directions Portal
 
-A white-labeled client portal for agencies built with Next.js 14, TypeScript, and modern tools.
+Custom-built HiBob implementation and integration management portal for Digital Directions. Built with Next.js 15, TypeScript, and modern tools.
+
+**Note:** This is a purpose-built portal for Digital Directions - not a white-label solution. All customization happens at the code level.
 
 ## Tech Stack
 
@@ -114,11 +116,11 @@ npm run db:seed
 ```
 
 This creates:
-- 1 agency (Apex Design Studio)
-- 4 clients (TechCorp, StartupX, RetailCo, DesignCo)
-- 4 projects with different statuses
+- 1 agency (Digital Directions)
+- 4 clients (Meridian Healthcare, Pinnacle Financial, Atlas Manufacturing, Horizon Tech)
+- 4 HiBob integration projects with different statuses
 - Demo files and messages
-- Edge case: DesignCo (overdue project, stalled communication)
+- Edge case: Horizon Tech (overdue project, stalled communication)
 
 ### 7. Run Development Server
 
@@ -226,11 +228,11 @@ Using polling (30-second intervals) for simplicity. Upgrade to Server-Sent Event
 ## Demo Data
 
 The seed script includes:
-- **Apex Design Studio** - Demo agency
-- **TechCorp** - Active client with in-progress project
-- **StartupX** - Active client in review stage
-- **RetailCo** - Inactive client with completed project
-- **DesignCo** - Edge case: archived, overdue project, no communication (3 weeks)
+- **Digital Directions** - HiBob consulting agency
+- **Meridian Healthcare** - Active client with HiBob → ADP integration in progress
+- **Pinnacle Financial** - Active client with onboarding workflow setup in review
+- **Atlas Manufacturing** - Active client with completed Greenhouse ATS sync
+- **Horizon Tech** - Edge case: archived, overdue BambooHR migration, no communication (3 weeks)
 
 ## Support
 

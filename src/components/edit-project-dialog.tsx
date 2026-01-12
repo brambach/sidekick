@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface EditProjectDialogProps {
   project: {
@@ -51,9 +52,10 @@ export function EditProjectDialog({ project }: EditProjectDialogProps) {
 
       router.refresh();
       setOpen(false);
+      toast.success("Project updated successfully");
     } catch (error) {
       console.error("Error updating project:", error);
-      alert("Failed to update project. Please try again.");
+      toast.error("Failed to update project. Please try again.");
     } finally {
       setLoading(false);
     }

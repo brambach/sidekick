@@ -10,6 +10,8 @@ import { MessageForm } from "@/components/message-form";
 import { FileUploader } from "@/components/file-uploader";
 import { EditProjectDialog } from "@/components/edit-project-dialog";
 import { UpdateStatusDialog } from "@/components/update-status-dialog";
+import { clerkClient } from "@clerk/nextjs/server";
+import { MessageList } from "@/components/message-list";
 
 export const dynamic = "force-dynamic";
 
@@ -83,18 +85,61 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     .orderBy(desc(files.uploadedAt));
 
   // Fetch project messages with sender info
-  const projectMessages = await db
+  const projectMessagesRaw = await db
     .select({
       id: messages.id,
       content: messages.content,
       read: messages.read,
       createdAt: messages.createdAt,
       senderId: messages.senderId,
+      senderClerkId: users.clerkId,
+      senderRole: users.role,
     })
     .from(messages)
+    .leftJoin(users, eq(messages.senderId, users.id))
     .where(and(eq(messages.projectId, id), isNull(messages.deletedAt)))
     .orderBy(desc(messages.createdAt))
     .limit(10);
+
+  // Fetch Clerk user info for senders
+  const clerkIds = [...new Set(projectMessagesRaw.map((m) => m.senderClerkId).filter(Boolean))] as string[];
+  const clerk = await clerkClient();
+
+  const clerkUsers = clerkIds.length > 0
+    ? await Promise.all(clerkIds.map(async (clerkId) => {
+        try {
+          return await clerk.users.getUser(clerkId);
+        } catch {
+          return null;
+        }
+      }))
+    : [];
+
+  const clerkUserMap = new Map(
+    clerkUsers
+      .filter((u): u is NonNullable<typeof u> => u !== null)
+      .map((u) => [u.id, u])
+  );
+
+  // Enrich messages with sender names
+  const projectMessages = projectMessagesRaw.map((message) => {
+    const clerkUser = message.senderClerkId ? clerkUserMap.get(message.senderClerkId) : null;
+    const senderName = clerkUser
+      ? `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "User"
+      : "User";
+    const senderAvatar = clerkUser?.imageUrl || null;
+
+    return {
+      id: message.id,
+      content: message.content,
+      read: message.read,
+      createdAt: message.createdAt,
+      senderId: message.senderId,
+      senderName,
+      senderAvatar,
+      senderRole: message.senderRole,
+    };
+  });
 
   const statusBadge = getStatusBadge(project.status);
   const now = new Date();
@@ -223,40 +268,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
-                Messages ({projectMessages.length})
+                Messages
               </h2>
-              <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                View All
-              </button>
             </div>
 
-            {projectMessages.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center">
-                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
-                <p className="text-gray-500 text-sm">No messages yet</p>
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm divide-y divide-gray-100">
-                {projectMessages.map((message) => (
-                  <div key={message.id} className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900">User</span>
-                          <span className="text-xs text-gray-500">
-                            {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{message.content}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <MessageList projectId={id} initialMessages={projectMessages} />
 
             {/* Message Input */}
             <div className="mt-4">

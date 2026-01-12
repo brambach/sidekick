@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 interface Client {
   id: string;
@@ -66,9 +67,10 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
       });
       setOpen(false);
       router.refresh();
+      toast.success("Project created successfully");
     } catch (error) {
       console.error("Error creating project:", error);
-      alert("Failed to create project. Please try again.");
+      toast.error("Failed to create project. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -95,7 +97,7 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
             <Input
               id="name"
               required
-              placeholder="Website Redesign"
+              placeholder="HiBob Integration Project"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
@@ -105,7 +107,7 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Brief description of the project scope and deliverables..."
+              placeholder="Describe the integration requirements, systems involved, and expected outcomes..."
               rows={3}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}

@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get Sidekick running in 10 minutes.
+Get Digital Directions Portal running in 10 minutes.
 
 ## Prerequisites
 
@@ -21,14 +21,14 @@ npm install
 
 1. Go to https://dashboard.clerk.com
 2. Click "Add application"
-3. Name it "Sidekick Dev"
+3. Name it "DD Portal Dev"
 4. Enable email/password auth
 5. Copy your keys
 
 ### 3. Set Up Vercel Postgres (2 mins)
 
 1. Go to https://vercel.com
-2. Create new project → Import your Sidekick repo
+2. Create new project → Import your DD Portal repo
 3. Go to Storage → Create Database → Postgres
 4. Copy connection strings
 
@@ -83,9 +83,9 @@ npm run db:seed
 ```
 
 You should see:
-- ✓ Created agency: Apex Design Studio
-- ✓ Created 4 clients
-- ✓ Created 4 projects
+- ✓ Created agency: Digital Directions
+- ✓ Created 4 clients (Meridian Healthcare, Pinnacle Financial, Atlas Manufacturing, Horizon Tech)
+- ✓ Created 4 HiBob integration projects
 - ✓ Created demo files and messages
 
 ### 8. Run Dev Server (10 secs)
@@ -131,8 +131,70 @@ npm run db:studio
 ### 10. Verify Everything Works
 
 - ✅ Visit `/dashboard/admin` - should see admin dashboard
-- ✅ Check sidebar - should see admin nav items
-- ✅ View placeholder pages (Clients, Projects, Settings)
+- ✅ Check sidebar - should see admin nav items (Overview, Clients, Projects, Tickets)
+- ✅ Test messaging on a project
+- ✅ Create a ticket from client view
+- ✅ Upload files to a project
+
+## Optional Integrations
+
+These are optional but highly recommended for a complete experience:
+
+### Slack Notifications (Optional)
+
+Get real-time notifications in Slack when:
+- Tickets are created
+- Messages are received from clients
+- Files are uploaded
+- Project statuses change
+
+**Setup:**
+1. Create Slack App at https://api.slack.com/apps
+2. Add Bot Token Scopes: `chat:write`, `channels:read`
+3. Install to workspace
+4. Create a channel (e.g., `#dd-portal-activity`)
+5. Add to `.env.local`:
+```env
+SLACK_BOT_TOKEN=xoxb-your-token
+SLACK_CHANNEL_ID=C0XXXXXXXXX
+```
+
+### Linear Integration (Optional)
+
+Automatically sync tickets to Linear for internal tracking:
+- Creates Linear issues when tickets are created
+- Syncs status changes bidirectionally
+- Links back to portal for full context
+
+**Setup:**
+1. Go to https://linear.app/settings/api
+2. Create API key
+3. Get your Team ID from Linear settings
+4. Add to `.env.local`:
+```env
+LINEAR_API_KEY=lin_api_xxxxx
+LINEAR_TEAM_ID=xxxxx
+```
+
+### Email Notifications (Optional)
+
+Send beautiful email notifications to clients:
+- Project status updates
+- Ticket responses
+- Ticket resolutions
+- New file uploads
+
+**Setup (Resend):**
+1. Create account at https://resend.com (free tier: 3,000 emails/month)
+2. Verify your domain OR use resend's test domain
+3. Create API key
+4. Add to `.env.local`:
+```env
+RESEND_API_KEY=re_xxxxx
+EMAIL_FROM=Digital Directions <notifications@yourdomain.com>
+```
+
+**Note:** All integrations are optional. The portal works perfectly without them, but they enhance the experience significantly!
 
 ## What's Next?
 

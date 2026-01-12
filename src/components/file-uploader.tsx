@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UploadButton } from "@/lib/uploadthing";
 import { Upload } from "lucide-react";
+import { toast } from "sonner";
 
 export function FileUploader({ projectId }: { projectId: string }) {
   const router = useRouter();
@@ -49,9 +50,10 @@ export function FileUploader({ projectId }: { projectId: string }) {
           console.log("All files saved, refreshing page");
           router.refresh();
           setIsUploading(false);
+          toast.success("Files uploaded successfully");
         } catch (error) {
           console.error("Error saving files:", error);
-          alert("Files uploaded but failed to save. Please refresh.");
+          toast.error("Files uploaded but failed to save. Please refresh.");
           setIsUploading(false);
         }
       }}
@@ -62,7 +64,7 @@ export function FileUploader({ projectId }: { projectId: string }) {
           name: error.name,
           stack: error.stack,
         });
-        alert(`Upload failed: ${error.message}`);
+        toast.error(`Upload failed: ${error.message}`);
         setIsUploading(false);
       }}
       appearance={{

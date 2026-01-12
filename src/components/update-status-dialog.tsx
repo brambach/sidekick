@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface UpdateStatusDialogProps {
   projectId: string;
@@ -42,9 +43,10 @@ export function UpdateStatusDialog({ projectId, currentStatus }: UpdateStatusDia
 
       router.refresh();
       setOpen(false);
+      toast.success("Status updated successfully");
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Failed to update status. Please try again.");
+      toast.error("Failed to update status. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -25,7 +25,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, primaryColor } = body;
+    const { name, primaryColor, logoUrl, domain } = body;
 
     // Validate required fields
     if (!name) {
@@ -35,14 +35,20 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Build update object
+    const updateData: any = {
+      name,
+      primaryColor: primaryColor || "#8B5CF6",
+      updatedAt: new Date(),
+    };
+
+    if (logoUrl !== undefined) updateData.logoUrl = logoUrl || null;
+    if (domain !== undefined) updateData.domain = domain || null;
+
     // Update the agency (assuming single agency for MVP)
     const updatedAgency = await db
       .update(agencies)
-      .set({
-        name,
-        primaryColor: primaryColor || "#3B82F6",
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .returning();
 
     return NextResponse.json(updatedAgency[0], { status: 200 });

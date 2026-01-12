@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { clients, projects, files } from "@/lib/db/schema";
 import { isNull, and, gte, sql } from "drizzle-orm";
 import { Users, FolderKanban, FileUp } from "lucide-react";
+import { InviteTeamMemberDialog } from "@/components/invite-team-member-dialog";
 
 export const dynamic = "force-dynamic";
 
@@ -39,9 +40,12 @@ export default async function AdminDashboard() {
 
   return (
     <div className="max-w-[1200px] mx-auto p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Admin Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Overview of your agency's client portal.</p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Admin Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overview of your agency&apos;s client portal.</p>
+        </div>
+        <InviteTeamMemberDialog />
       </div>
 
       {/* Stats Grid */}

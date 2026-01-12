@@ -6,19 +6,60 @@ import type { User, UserWithProfile, UserRole, ClerkPublicMetadata } from "./typ
 
 /**
  * Get current user from database (DB user only, for role/permissions)
+ * Auto-creates user in DB if they don't exist (e.g., new sign-ups)
  */
 export async function getCurrentUser(): Promise<User | null> {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
 
   if (!userId) {
     return null;
   }
 
-  const [user] = await db
+  // Try to get user from database (including soft-deleted)
+  let [user] = await db
     .select()
     .from(users)
-    .where(and(eq(users.clerkId, userId), isNull(users.deletedAt)))
+    .where(eq(users.clerkId, userId))
     .limit(1);
+
+  // If user doesn't exist in DB, create them (new sign-up)
+  if (!user) {
+    const metadata = (sessionClaims?.metadata as { role?: string }) || {};
+    const role = (metadata.role || "client") as "admin" | "client";
+
+    try {
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          clerkId: userId,
+          role: role,
+          agencyId: null,
+          clientId: null,
+        })
+        .returning();
+
+      user = newUser;
+    } catch (error) {
+      // If insert fails (duplicate key), fetch the existing user
+      console.error("Error creating user, fetching existing:", error);
+      [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.clerkId, userId))
+        .limit(1);
+    }
+  }
+
+  // If user was soft-deleted, un-delete them
+  if (user && user.deletedAt) {
+    const [reactivatedUser] = await db
+      .update(users)
+      .set({ deletedAt: null, updatedAt: new Date() })
+      .where(eq(users.id, user.id))
+      .returning();
+
+    user = reactivatedUser;
+  }
 
   return user || null;
 }

@@ -1,12 +1,15 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, files, messages } from "@/lib/db/schema";
+import { projects, files, messages, users } from "@/lib/db/schema";
 import { eq, isNull, and, desc } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, FileText, MessageSquare, Clock, Download, User } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, MessageSquare, Clock, Download } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { MessageForm } from "@/components/message-form";
+import { clerkClient } from "@clerk/nextjs/server";
+import { MessageList } from "@/components/message-list";
+import { ContactTeamButton } from "@/components/contact-team-button";
 
 export const dynamic = "force-dynamic";
 
@@ -67,19 +70,62 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
     .where(eq(files.projectId, id))
     .orderBy(desc(files.uploadedAt));
 
-  // Fetch project messages
-  const projectMessages = await db
+  // Fetch project messages with sender info
+  const projectMessagesRaw = await db
     .select({
       id: messages.id,
       content: messages.content,
       read: messages.read,
       createdAt: messages.createdAt,
       senderId: messages.senderId,
+      senderClerkId: users.clerkId,
+      senderRole: users.role,
     })
     .from(messages)
+    .leftJoin(users, eq(messages.senderId, users.id))
     .where(and(eq(messages.projectId, id), isNull(messages.deletedAt)))
     .orderBy(desc(messages.createdAt))
     .limit(10);
+
+  // Fetch Clerk user info for senders
+  const clerkIds = [...new Set(projectMessagesRaw.map((m) => m.senderClerkId).filter(Boolean))] as string[];
+  const clerk = await clerkClient();
+
+  const clerkUsers = clerkIds.length > 0
+    ? await Promise.all(clerkIds.map(async (clerkId) => {
+        try {
+          return await clerk.users.getUser(clerkId);
+        } catch {
+          return null;
+        }
+      }))
+    : [];
+
+  const clerkUserMap = new Map(
+    clerkUsers
+      .filter((u): u is NonNullable<typeof u> => u !== null)
+      .map((u) => [u.id, u])
+  );
+
+  // Enrich messages with sender names
+  const projectMessages = projectMessagesRaw.map((message) => {
+    const clerkUser = message.senderClerkId ? clerkUserMap.get(message.senderClerkId) : null;
+    const senderName = clerkUser
+      ? `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Team Member"
+      : "Team Member";
+    const senderAvatar = clerkUser?.imageUrl || null;
+
+    return {
+      id: message.id,
+      content: message.content,
+      read: message.read,
+      createdAt: message.createdAt,
+      senderId: message.senderId,
+      senderName,
+      senderAvatar,
+      senderRole: message.senderRole,
+    };
+  });
 
   const statusBadge = getStatusBadge(project.status);
   const now = new Date();
@@ -188,37 +234,11 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5" />
-                Messages ({projectMessages.length})
+                Messages
               </h2>
             </div>
 
-            {projectMessages.length === 0 ? (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center">
-                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
-                <p className="text-gray-500 text-sm">No messages yet</p>
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm divide-y divide-gray-100">
-                {projectMessages.map((message) => (
-                  <div key={message.id} className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm font-medium text-gray-900">Team Member</span>
-                          <span className="text-xs text-gray-500">
-                            {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{message.content}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <MessageList projectId={id} initialMessages={projectMessages} />
 
             {/* Message Input */}
             <div className="mt-4">
@@ -273,11 +293,9 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
           <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
             <p className="text-sm text-blue-900 font-medium mb-2">Need Help?</p>
             <p className="text-xs text-blue-700 mb-3">
-              Have questions about this project? Send us a message above and we'll get back to you shortly.
+              Have questions about this project? Send us a message above and we&apos;ll get back to you shortly.
             </p>
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition-colors text-sm font-medium">
-              Contact Team
-            </button>
+            <ContactTeamButton />
           </div>
         </div>
       </div>

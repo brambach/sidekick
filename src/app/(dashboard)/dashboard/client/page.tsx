@@ -105,7 +105,7 @@ export default async function ClientDashboard() {
       {/* Welcome Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Welcome back!</h1>
-        <p className="text-sm text-gray-500 mt-1">Here's what's happening with your projects.</p>
+        <p className="text-sm text-gray-500 mt-1">Here&apos;s what&apos;s happening with your projects.</p>
       </div>
 
       {/* Stats Grid */}

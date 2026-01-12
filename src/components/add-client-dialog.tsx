@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import { toast } from "sonner";
 
 export function AddClientDialog() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export function AddClientDialog() {
     contactName: "",
     contactEmail: "",
     status: "active",
+    sendInvite: true,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,20 +42,54 @@ export function AddClientDialog() {
       const response = await fetch("/api/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          companyName: formData.companyName,
+          contactName: formData.contactName,
+          contactEmail: formData.contactEmail,
+          status: formData.status,
+        }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to create client");
       }
 
+      const { client } = await response.json();
+
+      // Send invite if checkbox is checked
+      if (formData.sendInvite) {
+        try {
+          const inviteResponse = await fetch("/api/invites", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: formData.contactEmail,
+              role: "client",
+              clientId: client.id,
+            }),
+          });
+
+          if (!inviteResponse.ok) {
+            console.error("Failed to send invite, but client was created");
+            toast.success("Client created successfully, but invite failed to send");
+          } else {
+            toast.success(`Client created and invite sent to ${formData.contactEmail}`);
+          }
+        } catch (inviteError) {
+          console.error("Error sending invite:", inviteError);
+          toast.success("Client created successfully, but invite failed to send");
+        }
+      } else {
+        toast.success("Client created successfully");
+      }
+
       // Reset form and close dialog
-      setFormData({ companyName: "", contactName: "", contactEmail: "", status: "active" });
+      setFormData({ companyName: "", contactName: "", contactEmail: "", status: "active", sendInvite: true });
       setOpen(false);
       router.refresh();
     } catch (error) {
       console.error("Error creating client:", error);
-      alert("Failed to create client. Please try again.");
+      toast.error("Failed to create client. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -71,7 +107,7 @@ export function AddClientDialog() {
         <DialogHeader>
           <DialogTitle>Add New Client</DialogTitle>
           <DialogDescription>
-            Create a new client profile. They'll be able to view projects and files you assign to them.
+            Create a new client profile. They&apos;ll be able to view projects and files you assign to them.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -80,7 +116,7 @@ export function AddClientDialog() {
             <Input
               id="companyName"
               required
-              placeholder="Acme Inc."
+              placeholder="Global Dynamics Inc."
               value={formData.companyName}
               onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
             />
@@ -91,7 +127,7 @@ export function AddClientDialog() {
             <Input
               id="contactName"
               required
-              placeholder="John Smith"
+              placeholder="Amanda Torres"
               value={formData.contactName}
               onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
             />
@@ -103,7 +139,7 @@ export function AddClientDialog() {
               id="contactEmail"
               type="email"
               required
-              placeholder="john@acme.com"
+              placeholder="amanda@globaldynamics.com"
               value={formData.contactEmail}
               onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
             />
@@ -124,6 +160,19 @@ export function AddClientDialog() {
                 <SelectItem value="archived">Archived</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="flex items-center space-x-2 pt-2">
+            <input
+              type="checkbox"
+              id="sendInvite"
+              checked={formData.sendInvite}
+              onChange={(e) => setFormData({ ...formData, sendInvite: e.target.checked })}
+              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-600"
+            />
+            <label htmlFor="sendInvite" className="text-sm text-gray-700 cursor-pointer">
+              Send portal invite email to contact
+            </label>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

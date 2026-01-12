@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function MessageForm({ projectId }: { projectId: string }) {
   const router = useRouter();
@@ -27,9 +28,10 @@ export function MessageForm({ projectId }: { projectId: string }) {
 
       setContent("");
       router.refresh();
+      toast.success("Message sent");
     } catch (error) {
       console.error("Error sending message:", error);
-      alert("Failed to send message. Please try again.");
+      toast.error("Failed to send message. Please try again.");
     } finally {
       setLoading(false);
     }

@@ -34,52 +34,52 @@ async function seed() {
     const [agency] = await db
       .insert(agencies)
       .values({
-        name: "Apex Design Studio",
-        logoUrl: "https://picsum.photos/seed/apex/200/200",
-        primaryColor: "#3B82F6",
-        domain: "apexdesign.studio",
+        name: "Digital Directions",
+        logoUrl: "https://picsum.photos/seed/digitaldirections/200/200",
+        primaryColor: "#8B5CF6",
+        domain: "portal.digitaldirections.com",
       })
       .returning();
 
     console.log(`✓ Created agency: ${agency.name}`);
 
     // Create clients
-    const [techCorp, startupX, retailCo, designCo] = await db
+    const [meridian, pinnacle, atlas, horizon] = await db
       .insert(clients)
       .values([
         {
           agencyId: agency.id,
-          companyName: "TechCorp Industries",
-          contactName: "John Smith",
-          contactEmail: "john@techcorp.com",
+          companyName: "Meridian Healthcare Group",
+          contactName: "Jennifer Walsh",
+          contactEmail: "jennifer.walsh@meridianhealthcare.com",
           status: "active",
         },
         {
           agencyId: agency.id,
-          companyName: "StartupX",
-          contactName: "Sarah Johnson",
-          contactEmail: "sarah@startupx.io",
+          companyName: "Pinnacle Financial Services",
+          contactName: "Robert Chen",
+          contactEmail: "r.chen@pinnaclefs.com",
           status: "active",
         },
         {
           agencyId: agency.id,
-          companyName: "RetailCo",
-          contactName: "Mike Davis",
-          contactEmail: "mike@retailco.com",
-          status: "inactive",
+          companyName: "Atlas Manufacturing",
+          contactName: "Sarah Mitchell",
+          contactEmail: "smitchell@atlasmfg.com",
+          status: "active",
         },
         {
           agencyId: agency.id,
-          companyName: "DesignCo",
-          contactName: "Lisa Brown",
-          contactEmail: "lisa@designco.com",
+          companyName: "Horizon Tech Solutions",
+          contactName: "David Park",
+          contactEmail: "dpark@horizontech.io",
           status: "archived",
         },
       ])
       .returning();
 
     console.log(
-      `✓ Created clients: ${[techCorp, startupX, retailCo, designCo]
+      `✓ Created clients: ${[meridian, pinnacle, atlas, horizon]
         .map((c) => c.companyName)
         .join(", ")}`
     );
@@ -95,23 +95,23 @@ async function seed() {
       .returning();
 
     // Create client users
-    const [techCorpUser, startupXUser, retailCoUser] = await db
+    const [meridianUser, pinnacleUser, atlasUser] = await db
       .insert(users)
       .values([
         {
-          clerkId: "demo_techcorp_clerk_id",
+          clerkId: "demo_meridian_clerk_id",
           role: "client",
-          clientId: techCorp.id,
+          clientId: meridian.id,
         },
         {
-          clerkId: "demo_startupx_clerk_id",
+          clerkId: "demo_pinnacle_clerk_id",
           role: "client",
-          clientId: startupX.id,
+          clientId: pinnacle.id,
         },
         {
-          clerkId: "demo_retailco_clerk_id",
+          clerkId: "demo_atlas_clerk_id",
           role: "client",
-          clientId: retailCo.id,
+          clientId: atlas.id,
         },
       ])
       .returning();
@@ -141,37 +141,37 @@ async function seed() {
       .insert(projects)
       .values([
         {
-          clientId: techCorp.id,
-          name: "Corporate Website Redesign",
+          clientId: meridian.id,
+          name: "HiBob → ADP Payroll Integration",
           description:
-            "Complete overhaul of the TechCorp corporate website with modern design and improved UX.",
+            "Configure bi-directional sync between HiBob and ADP for payroll processing, tax calculations, and employee compensation data.",
           status: "in_progress",
           startDate: oneMonthAgo,
           dueDate: nextMonth,
         },
         {
-          clientId: startupX.id,
-          name: "Mobile App UI/UX",
+          clientId: pinnacle.id,
+          name: "HiBob Onboarding Workflow Setup",
           description:
-            "Design and prototype for StartupX flagship mobile application.",
+            "Design and implement automated onboarding workflows including document collection, equipment provisioning, and IT access requests.",
           status: "review",
           startDate: oneMonthAgo,
           dueDate: nextMonth,
         },
         {
-          clientId: retailCo.id,
-          name: "E-commerce Platform",
+          clientId: atlas.id,
+          name: "HiBob → Greenhouse ATS Sync",
           description:
-            "Full e-commerce solution with payment integration and inventory management.",
+            "Seamless integration between Greenhouse ATS and HiBob for new hire data transfer and recruitment analytics.",
           status: "completed",
           startDate: twoMonthsAgo,
           dueDate: oneMonthAgo,
         },
         {
-          clientId: designCo.id,
-          name: "Brand Refresh",
+          clientId: horizon.id,
+          name: "HiBob Data Migration from BambooHR",
           description:
-            "Complete brand identity refresh including logo, colors, and guidelines.",
+            "Full employee data migration from BambooHR including historical records, documents, and time-off balances.",
           status: "on_hold",
           startDate: twoMonthsAgo,
           dueDate: twoWeeksAgo, // Overdue by 2 weeks
@@ -184,25 +184,25 @@ async function seed() {
     // Create client activity records
     await db.insert(clientActivity).values([
       {
-        clientId: techCorp.id,
+        clientId: meridian.id,
         lastLogin: oneDayAgo,
         lastMessageSent: twoDaysAgo,
         lastFileDownloaded: fiveDaysAgo,
       },
       {
-        clientId: startupX.id,
+        clientId: pinnacle.id,
         lastLogin: oneDayAgo,
         lastMessageSent: twoDaysAgo,
         lastFileDownloaded: twoDaysAgo,
       },
       {
-        clientId: retailCo.id,
+        clientId: atlas.id,
         lastLogin: oneMonthAgo,
         lastMessageSent: oneMonthAgo,
         lastFileDownloaded: twoMonthsAgo,
       },
       {
-        clientId: designCo.id,
+        clientId: horizon.id,
         lastLogin: threeWeeksAgo,
         lastMessageSent: null, // Never sent a message
         lastFileDownloaded: null, // Never downloaded a file
@@ -215,13 +215,13 @@ async function seed() {
     console.log("✅ Seed completed successfully!");
     console.log("");
     console.log("Demo data created:");
-    console.log("  - 1 agency (Apex Design Studio)");
-    console.log("  - 4 clients (TechCorp, StartupX, RetailCo, DesignCo)");
+    console.log("  - 1 agency (Digital Directions)");
+    console.log("  - 4 clients (Meridian Healthcare, Pinnacle Financial, Atlas Manufacturing, Horizon Tech)");
     console.log("  - 4 users (1 admin, 3 client users)");
-    console.log("  - 4 projects (various statuses, including 1 overdue)");
+    console.log("  - 4 HiBob integration projects (various statuses, including 1 overdue)");
     console.log("  - 4 client activity records");
     console.log("");
-    console.log("Note: DesignCo is an edge case client with:");
+    console.log("Note: Horizon Tech is an edge case client with:");
     console.log("  - Archived status");
     console.log("  - Overdue project (2 weeks)");
     console.log("  - Stalled communication (3 weeks)");
