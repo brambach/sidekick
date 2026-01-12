@@ -29,7 +29,7 @@ function getStatusBadge(status: string): { bg: string; text: string; border: str
 function getProjectStatusBadge(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case "in_progress":
-      return { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-100", label: "In Progress" };
+      return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Progress" };
     case "review":
       return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Review" };
     case "completed":
@@ -130,7 +130,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Mail className="w-4 h-4" />
-                <a href={`mailto:${client.contactEmail}`} className="hover:text-blue-600 transition-colors">
+                <a href={`mailto:${client.contactEmail}`} className="hover:text-purple-600 transition-colors">
                   {client.contactEmail}
                 </a>
               </div>
@@ -156,7 +156,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-500">Active</span>
-            <Clock className="text-blue-500 w-5 h-5" strokeWidth={1.5} />
+            <Clock className="text-purple-500 w-5 h-5" strokeWidth={1.5} />
           </div>
           <div className="text-3xl font-semibold text-gray-900 tracking-tight">{activeProjects}</div>
         </div>
@@ -205,7 +205,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">
+                        <h3 className="text-lg font-semibold text-gray-900 tracking-tight group-hover:text-purple-600 transition-colors">
                           {project.name}
                         </h3>
                         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
@@ -256,8 +256,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </div>
                   {portalUsers.map((user) => (
                     <div key={user.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <User className="w-4 h-4 text-blue-600" strokeWidth={1.5} />
+                      <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
+                        <User className="w-4 h-4 text-purple-600" strokeWidth={1.5} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900">

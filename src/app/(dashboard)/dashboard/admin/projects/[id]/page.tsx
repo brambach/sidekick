@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 function getStatusBadge(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case "in_progress":
-      return { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-100", label: "In Progress" };
+      return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Progress" };
     case "review":
       return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Review" };
     case "completed":
@@ -43,9 +43,9 @@ function formatFileSize(bytes: number): string {
 // Helper function to get file icon color
 function getFileIconColor(fileType: string): string {
   if (fileType.includes("pdf")) return "text-red-500";
-  if (fileType.includes("image")) return "text-blue-500";
+  if (fileType.includes("image")) return "text-purple-500";
   if (fileType.includes("zip")) return "text-purple-500";
-  if (fileType.includes("word") || fileType.includes("document")) return "text-blue-600";
+  if (fileType.includes("word") || fileType.includes("document")) return "text-purple-600";
   return "text-gray-500";
 }
 
@@ -252,7 +252,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                         href={file.fileUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 transition-colors flex-shrink-0"
+                        className="text-purple-600 hover:text-purple-700 transition-colors flex-shrink-0"
                       >
                         <Download className="w-4 h-4" />
                       </a>
@@ -291,7 +291,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 <p className="text-sm font-medium text-gray-500 mb-1">Client</p>
                 <Link
                   href={`/dashboard/admin/clients/${project.clientId}`}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                 >
                   {project.clientName}
                 </Link>

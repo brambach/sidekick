@@ -14,7 +14,7 @@ interface UpdateStatusDialogProps {
 
 const statuses = [
   { value: "planning", label: "Planning", color: "bg-gray-100 text-gray-700 border-gray-200" },
-  { value: "in_progress", label: "In Progress", color: "bg-blue-50 text-blue-700 border-blue-100" },
+  { value: "in_progress", label: "In Progress", color: "bg-purple-50 text-purple-700 border-purple-100" },
   { value: "review", label: "In Review", color: "bg-purple-50 text-purple-700 border-purple-100" },
   { value: "completed", label: "Completed", color: "bg-green-50 text-green-700 border-green-100" },
   { value: "on_hold", label: "On Hold", color: "bg-orange-50 text-orange-700 border-orange-100" },
@@ -55,7 +55,7 @@ export function UpdateStatusDialog({ projectId, currentStatus }: UpdateStatusDia
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
+        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
           Update Status
         </button>
       </DialogTrigger>

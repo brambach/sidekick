@@ -11,9 +11,9 @@ const statusStyles = {
     label: "Open",
   },
   in_progress: {
-    bg: "bg-blue-50",
-    text: "text-blue-700",
-    border: "border-blue-200",
+    bg: "bg-purple-50",
+    text: "text-purple-700",
+    border: "border-purple-200",
     label: "In Progress",
   },
   waiting_on_client: {
@@ -62,9 +62,9 @@ const priorityStyles = {
     label: "Low",
   },
   medium: {
-    bg: "bg-blue-50",
-    text: "text-blue-600",
-    border: "border-blue-200",
+    bg: "bg-purple-50",
+    text: "text-purple-600",
+    border: "border-purple-200",
     label: "Medium",
   },
   high: {
@@ -106,8 +106,8 @@ const typeStyles = {
     label: "Support",
   },
   project_issue: {
-    bg: "bg-blue-50",
-    text: "text-blue-600",
+    bg: "bg-purple-50",
+    text: "text-purple-600",
     label: "Project Issue",
   },
   feature_request: {

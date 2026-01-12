@@ -22,7 +22,7 @@ function getInitials(companyName: string): string {
 // Helper function to get avatar color based on company name
 function getAvatarColor(companyName: string): { bg: string; text: string; border: string } {
   const colors = [
-    { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" },
+    { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100" },
     { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-100" },
     { bg: "bg-green-50", text: "text-green-600", border: "border-green-100" },
     { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
@@ -238,7 +238,7 @@ export default async function ClientsPage() {
                 </div>
                 <Link
                   href={`/dashboard/admin/clients/${client.id}`}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1 transition-colors mt-1"
+                  className="text-purple-600 hover:text-purple-700 font-medium text-sm flex items-center gap-1 transition-colors mt-1"
                 >
                   View Details
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" strokeWidth={1.5} />

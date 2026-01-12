@@ -127,7 +127,7 @@ export default async function AdminTicketsPage() {
         </div>
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
           <p className="text-sm font-medium text-gray-500">In Progress</p>
-          <p className="text-2xl font-semibold text-blue-600">{inProgressTickets.length}</p>
+          <p className="text-2xl font-semibold text-purple-600">{inProgressTickets.length}</p>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
           <p className="text-sm font-medium text-gray-500">Resolved</p>

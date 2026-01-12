@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-full">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-500">Active Projects</span>
-            <FolderKanban className="text-blue-500 w-5 h-5" strokeWidth={1.5} />
+            <FolderKanban className="text-purple-500 w-5 h-5" strokeWidth={1.5} />
           </div>
           <div className="text-3xl font-semibold text-gray-900 tracking-tight">{projectStats}</div>
         </div>

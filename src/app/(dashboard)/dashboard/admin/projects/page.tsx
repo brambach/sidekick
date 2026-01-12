@@ -14,9 +14,9 @@ function getStatusBadge(status: string): { bg: string; text: string; border: str
   switch (status) {
     case "in_progress":
       return {
-        bg: "bg-blue-50",
-        text: "text-blue-700",
-        border: "border-blue-100",
+        bg: "bg-purple-50",
+        text: "text-purple-700",
+        border: "border-purple-100",
         label: "In Progress",
         icon: FolderOpen
       };
@@ -132,7 +132,7 @@ export default async function ProjectsPage() {
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between h-full">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-500">Active</span>
-            <Clock className="text-blue-500 w-5 h-5" strokeWidth={1.5} />
+            <Clock className="text-purple-500 w-5 h-5" strokeWidth={1.5} />
           </div>
           <div className="text-3xl font-semibold text-gray-900 tracking-tight">{activeProjects}</div>
         </div>
@@ -200,7 +200,7 @@ export default async function ProjectsPage() {
                   </span>
                   <Link
                     href={`/dashboard/admin/projects/${project.id}`}
-                    className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                    className="text-purple-600 hover:text-purple-700 font-medium text-sm"
                   >
                     View
                   </Link>

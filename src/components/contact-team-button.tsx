@@ -17,7 +17,7 @@ export function ContactTeamButton() {
   return (
     <button
       onClick={handleClick}
-      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition-colors text-sm font-medium"
+      className="w-full bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-md transition-colors text-sm font-medium"
     >
       Contact Team
     </button>

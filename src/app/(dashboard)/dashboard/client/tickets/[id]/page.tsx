@@ -154,7 +154,7 @@ export default async function ClientTicketDetailPage({ params }: { params: Promi
           {ticket.projectName && (
             <Link
               href={`/dashboard/client/projects/${ticket.projectId}`}
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+              className="flex items-center gap-2 text-purple-600 hover:text-purple-700"
             >
               <FolderKanban className="w-4 h-4" />
               <span>{ticket.projectName}</span>

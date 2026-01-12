@@ -100,7 +100,7 @@ export function MessageList({ projectId, initialMessages }: MessageListProps) {
           <button
             onClick={loadMore}
             disabled={loading}
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 inline-flex items-center gap-2"
+            className="text-sm text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50 inline-flex items-center gap-2"
           >
             {loading ? (
               <>

@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 function getStatusBadge(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case "in_progress":
-      return { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-100", label: "In Progress" };
+      return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Progress" };
     case "review":
       return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Review" };
     case "completed":
@@ -121,7 +121,7 @@ export default async function ClientDashboard() {
         <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-500">Active</span>
-            <Clock className="text-blue-500 w-5 h-5" strokeWidth={1.5} />
+            <Clock className="text-purple-500 w-5 h-5" strokeWidth={1.5} />
           </div>
           <div className="text-3xl font-semibold text-gray-900 tracking-tight">{activeProjects}</div>
         </div>
@@ -168,7 +168,7 @@ export default async function ClientDashboard() {
                   <div className="flex flex-col h-full">
                     {/* Project Header */}
                     <div className="flex items-start justify-between gap-3 mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">
+                      <h3 className="text-lg font-semibold text-gray-900 tracking-tight group-hover:text-purple-600 transition-colors">
                         {project.name}
                       </h3>
                       <span
@@ -203,7 +203,7 @@ export default async function ClientDashboard() {
                         <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.5} />
                         <span>{project.messageCount} {project.messageCount === 1 ? "message" : "messages"}</span>
                         {project.unreadCount > 0 && (
-                          <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] font-medium text-white bg-blue-600 rounded-full">
+                          <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] font-medium text-white bg-purple-600 rounded-full">
                             {project.unreadCount}
                           </span>
                         )}

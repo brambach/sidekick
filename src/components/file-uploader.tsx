@@ -69,7 +69,7 @@ export function FileUploader({ projectId }: { projectId: string }) {
       }}
       appearance={{
         button:
-          "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium flex items-center gap-2 shadow-sm ut-uploading:cursor-not-allowed",
+          "bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium flex items-center gap-2 shadow-sm ut-uploading:cursor-not-allowed",
         allowedContent: "hidden",
       }}
       content={{
