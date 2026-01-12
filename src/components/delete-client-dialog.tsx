@@ -58,26 +58,28 @@ export function DeleteClientDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Permanently Delete Client?</AlertDialogTitle>
-          <AlertDialogDescription className="space-y-3">
-            <p className="font-semibold text-gray-900">
-              Are you sure you want to permanently delete <span className="text-red-600">{companyName}</span>?
-            </p>
-            <p>
-              This action <span className="font-semibold text-red-600">cannot be undone</span>. All
-              associated data will be permanently removed:
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-sm">
-              <li>All projects</li>
-              <li>All files and documents</li>
-              <li>All messages and conversations</li>
-              <li>All support tickets</li>
-              <li>Activity history</li>
-            </ul>
-            <p className="font-medium pt-2">
-              If you just want to pause the relationship, consider marking them as{" "}
-              <span className="text-gray-600">Inactive</span> or{" "}
-              <span className="text-gray-600">Archived</span> instead.
-            </p>
+          <AlertDialogDescription asChild>
+            <div className="space-y-3">
+              <p className="font-semibold text-gray-900">
+                Are you sure you want to permanently delete <span className="text-red-600">{companyName}</span>?
+              </p>
+              <p>
+                This action <span className="font-semibold text-red-600">cannot be undone</span>. All
+                associated data will be permanently removed:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>All projects</li>
+                <li>All files and documents</li>
+                <li>All messages and conversations</li>
+                <li>All support tickets</li>
+                <li>Activity history</li>
+              </ul>
+              <p className="font-medium pt-2">
+                If you just want to pause the relationship, consider marking them as{" "}
+                <span className="text-gray-600">Inactive</span> or{" "}
+                <span className="text-gray-600">Archived</span> instead.
+              </p>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
