@@ -6,10 +6,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, CheckCircle, XCircle, Archive } from "lucide-react";
+import { MoreVertical, CheckCircle, XCircle, Archive, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DeleteClientDialog } from "./delete-client-dialog";
 
 interface ClientStatusMenuProps {
   clientId: string;
@@ -20,6 +22,7 @@ interface ClientStatusMenuProps {
 export function ClientStatusMenu({ clientId, currentStatus, companyName }: ClientStatusMenuProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleStatusChange = async (newStatus: string) => {
     if (newStatus === currentStatus) return;
@@ -54,42 +57,60 @@ export function ClientStatusMenu({ clientId, currentStatus, companyName }: Clien
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
-          disabled={loading}
-          aria-label="Change client status"
-        >
-          <MoreVertical className="w-4 h-4 text-gray-500" strokeWidth={1.5} />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem
-          onClick={() => handleStatusChange("active")}
-          disabled={currentStatus === "active" || loading}
-          className="cursor-pointer"
-        >
-          <CheckCircle className="w-4 h-4 mr-2 text-green-600" strokeWidth={1.5} />
-          <span>Mark as Active</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleStatusChange("inactive")}
-          disabled={currentStatus === "inactive" || loading}
-          className="cursor-pointer"
-        >
-          <XCircle className="w-4 h-4 mr-2 text-gray-500" strokeWidth={1.5} />
-          <span>Mark as Inactive</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => handleStatusChange("archived")}
-          disabled={currentStatus === "archived" || loading}
-          className="cursor-pointer"
-        >
-          <Archive className="w-4 h-4 mr-2 text-red-600" strokeWidth={1.5} />
-          <span>Archive</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+            disabled={loading}
+            aria-label="Change client status"
+          >
+            <MoreVertical className="w-4 h-4 text-gray-500" strokeWidth={1.5} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuItem
+            onClick={() => handleStatusChange("active")}
+            disabled={currentStatus === "active" || loading}
+            className="cursor-pointer"
+          >
+            <CheckCircle className="w-4 h-4 mr-2 text-green-600" strokeWidth={1.5} />
+            <span>Mark as Active</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleStatusChange("inactive")}
+            disabled={currentStatus === "inactive" || loading}
+            className="cursor-pointer"
+          >
+            <XCircle className="w-4 h-4 mr-2 text-gray-500" strokeWidth={1.5} />
+            <span>Mark as Inactive</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => handleStatusChange("archived")}
+            disabled={currentStatus === "archived" || loading}
+            className="cursor-pointer"
+          >
+            <Archive className="w-4 h-4 mr-2 text-gray-600" strokeWidth={1.5} />
+            <span>Archive</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => setDeleteDialogOpen(true)}
+            disabled={loading}
+            className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+          >
+            <Trash2 className="w-4 h-4 mr-2" strokeWidth={1.5} />
+            <span>Delete Permanently</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DeleteClientDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        clientId={clientId}
+        companyName={companyName}
+      />
+    </>
   );
 }
