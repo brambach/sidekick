@@ -5,6 +5,7 @@ import { eq, isNull, and, count, sql } from "drizzle-orm";
 import Link from "next/link";
 import { Users, Activity, Archive, FolderOpen, Zap, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
 import { AddClientDialog } from "@/components/add-client-dialog";
+import { ClientStatusMenu } from "@/components/client-status-menu";
 
 export const dynamic = "force-dynamic";
 
@@ -207,11 +208,18 @@ export default async function ClientsPage() {
               </div>
               {/* Right Side */}
               <div className="flex flex-col items-end gap-3">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge.bg} ${statusBadge.text} border ${statusBadge.border}`}
-                >
-                  {statusBadge.label}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge.bg} ${statusBadge.text} border ${statusBadge.border}`}
+                  >
+                    {statusBadge.label}
+                  </span>
+                  <ClientStatusMenu
+                    clientId={client.id}
+                    currentStatus={client.status}
+                    companyName={client.companyName}
+                  />
+                </div>
                 <Link
                   href={`/dashboard/admin/clients/${client.id}`}
                   className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1 transition-colors mt-1"
