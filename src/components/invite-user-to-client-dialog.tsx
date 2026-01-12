@@ -43,16 +43,23 @@ export function InviteUserToClientDialog({ clientId, companyName }: InviteUserTo
 
       if (!response.ok) {
         const error = await response.json();
+
+        // Check if it's a duplicate invite error
+        if (error.error?.includes("already exists")) {
+          toast.error(`${email} has already been invited. Check the "Pending Invites" section below to see who's waiting to sign up.`);
+        } else {
+          toast.error(error.error || "Failed to send invite");
+        }
         throw new Error(error.error || "Failed to send invite");
       }
 
       setEmail("");
       setOpen(false);
       router.refresh();
-      toast.success(`Invite sent to ${email}`);
+      toast.success(`Invite sent to ${email}! They'll receive an email with signup instructions.`);
     } catch (error) {
       console.error("Error sending invite:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to send invite");
+      // Error already handled above with better messaging
     } finally {
       setLoading(false);
     }

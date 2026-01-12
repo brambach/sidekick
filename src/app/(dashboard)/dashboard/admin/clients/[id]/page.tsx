@@ -1,10 +1,10 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { clients, projects, clientActivity, users } from "@/lib/db/schema";
-import { eq, isNull, and } from "drizzle-orm";
+import { clients, projects, clientActivity, users, invites } from "@/lib/db/schema";
+import { eq, isNull, and, gt } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon } from "lucide-react";
+import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon, MailCheck } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { AddProjectDialog } from "@/components/add-project-dialog";
 import { InviteUserToClientDialog } from "@/components/invite-user-to-client-dialog";
@@ -85,6 +85,24 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     .from(users)
     .where(and(eq(users.clientId, id), isNull(users.deletedAt)))
     .orderBy(users.createdAt);
+
+  // Fetch pending invites for this client
+  const pendingInvites = await db
+    .select({
+      id: invites.id,
+      email: invites.email,
+      expiresAt: invites.expiresAt,
+      createdAt: invites.createdAt,
+    })
+    .from(invites)
+    .where(
+      and(
+        eq(invites.clientId, id),
+        eq(invites.status, "pending"),
+        gt(invites.expiresAt, new Date())
+      )
+    )
+    .orderBy(invites.createdAt);
 
   // Calculate project stats
   const totalProjects = clientProjects.length;
@@ -273,6 +291,40 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               )}
             </div>
           </div>
+
+          {/* Pending Invites */}
+          {pendingInvites.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Pending Invites</h2>
+
+              <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                    <MailCheck className="w-4 h-4" />
+                    <span className="font-medium">{pendingInvites.length} pending invite{pendingInvites.length > 1 ? "s" : ""}</span>
+                  </div>
+                  {pendingInvites.map((invite) => (
+                    <div key={invite.id} className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-100 rounded-md">
+                      <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <Clock className="w-4 h-4 text-yellow-600" strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">
+                          {invite.email}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Sent {formatDistanceToNow(new Date(invite.createdAt), { addSuffix: true })} • Expires {formatDistanceToNow(new Date(invite.expiresAt), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-xs text-gray-500 mt-2">
+                    These users have been invited but haven't signed up yet. Invites expire after 7 days.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Activity */}
           <div>
