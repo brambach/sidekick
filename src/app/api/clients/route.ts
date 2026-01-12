@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { clients, users } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { clients, users, agencies } from "@/lib/db/schema";
+import { eq, isNull } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,8 +24,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    if (!user.agencyId) {
-      return NextResponse.json({ error: "User not associated with an agency" }, { status: 400 });
+    // Get agency ID (from user or get the first/only agency - Digital Directions)
+    let agencyId = user.agencyId;
+
+    if (!agencyId) {
+      const [agency] = await db
+        .select()
+        .from(agencies)
+        .where(isNull(agencies.deletedAt))
+        .limit(1);
+
+      if (!agency) {
+        return NextResponse.json({ error: "No agency found. Please run database seed." }, { status: 400 });
+      }
+
+      agencyId = agency.id;
+
+      // Update user with agency ID for future requests
+      await db
+        .update(users)
+        .set({ agencyId: agency.id })
+        .where(eq(users.clerkId, userId));
     }
 
     const body = await req.json();
@@ -43,7 +62,7 @@ export async function POST(req: NextRequest) {
     const [newClient] = await db
       .insert(clients)
       .values({
-        agencyId: user.agencyId,
+        agencyId,
         companyName,
         contactName,
         contactEmail,
