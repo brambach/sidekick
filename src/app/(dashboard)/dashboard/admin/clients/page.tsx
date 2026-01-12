@@ -1,9 +1,9 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { clients, projects, clientActivity } from "@/lib/db/schema";
+import { clients, projects, clientActivity, users } from "@/lib/db/schema";
 import { eq, isNull, and, count, sql } from "drizzle-orm";
 import Link from "next/link";
-import { Users, Activity, Archive, FolderOpen, Zap, CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
+import { Users, Activity, Archive, FolderOpen, Zap, CheckCircle, AlertCircle, ArrowRight, User } from "lucide-react";
 import { AddClientDialog } from "@/components/add-client-dialog";
 import { ClientStatusMenu } from "@/components/client-status-menu";
 
@@ -90,11 +90,19 @@ export default async function ClientsPage() {
         p.dueDate && new Date(p.dueDate) < now && p.status !== "completed"
       ).length;
 
+      // Count users for this client
+      const userCount = await db
+        .select({ count: count() })
+        .from(users)
+        .where(and(eq(users.clientId, client.id), isNull(users.deletedAt)))
+        .then((rows) => rows[0]?.count || 0);
+
       return {
         ...client,
         activeProjects,
         completedProjects,
         overdueProjects,
+        userCount,
       };
     })
   );
@@ -200,9 +208,17 @@ export default async function ClientsPage() {
                     </div>
                     <div className="text-sm text-gray-500">{client.contactEmail}</div>
                   </div>
-                  <div className={`mt-3 flex items-center gap-1.5 text-xs ${projectStatusColor}`}>
-                    {projectStatusIcon}
-                    <span>{projectStatusText}</span>
+                  <div className="mt-3 space-y-1.5">
+                    <div className={`flex items-center gap-1.5 text-xs ${projectStatusColor}`}>
+                      {projectStatusIcon}
+                      <span>{projectStatusText}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <User className="w-3.5 h-3.5" strokeWidth={1.5} />
+                      <span>
+                        {client.userCount === 0 ? "No portal users" : `${client.userCount} portal user${client.userCount > 1 ? "s" : ""}`}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

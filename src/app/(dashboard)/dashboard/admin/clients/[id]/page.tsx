@@ -1,12 +1,13 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { clients, projects, clientActivity } from "@/lib/db/schema";
+import { clients, projects, clientActivity, users } from "@/lib/db/schema";
 import { eq, isNull, and } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { AddProjectDialog } from "@/components/add-project-dialog";
+import { InviteUserToClientDialog } from "@/components/invite-user-to-client-dialog";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +73,18 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     .where(eq(clientActivity.clientId, id))
     .limit(1)
     .then((rows) => rows[0] || null);
+
+  // Fetch portal users for this client
+  const portalUsers = await db
+    .select({
+      id: users.id,
+      clerkId: users.clerkId,
+      role: users.role,
+      createdAt: users.createdAt,
+    })
+    .from(users)
+    .where(and(eq(users.clientId, id), isNull(users.deletedAt)))
+    .orderBy(users.createdAt);
 
   // Calculate project stats
   const totalProjects = clientProjects.length;
@@ -218,45 +231,90 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </div>
 
         {/* Activity Sidebar */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">Activity</h2>
+        <div className="space-y-6">
+          {/* Portal Users */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Portal Users</h2>
+              <InviteUserToClientDialog clientId={client.id} companyName={client.companyName} />
+            </div>
 
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                  <Activity className="w-4 h-4" />
-                  <span className="font-medium">Last Login</span>
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+              {portalUsers.length === 0 ? (
+                <div className="text-center py-8">
+                  <User className="w-12 h-12 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
+                  <p className="text-sm text-gray-500 mb-4">No portal users yet</p>
+                  <p className="text-xs text-gray-400">
+                    Invite users from {client.companyName} to give them access to projects and files.
+                  </p>
                 </div>
-                <p className="text-sm text-gray-900 ml-6">
-                  {activity?.lastLogin
-                    ? formatDistanceToNow(new Date(activity.lastLogin), { addSuffix: true })
-                    : "Never"}
-                </p>
-              </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                    <UsersIcon className="w-4 h-4" />
+                    <span className="font-medium">{portalUsers.length} user{portalUsers.length > 1 ? "s" : ""}</span>
+                  </div>
+                  {portalUsers.map((user) => (
+                    <div key={user.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
+                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <User className="w-4 h-4 text-blue-600" strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">
+                          User ID: {user.clerkId.slice(0, 10)}...
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Joined {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
 
-              <div>
-                <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                  <Mail className="w-4 h-4" />
-                  <span className="font-medium">Last Message</span>
-                </div>
-                <p className="text-sm text-gray-900 ml-6">
-                  {activity?.lastMessageSent
-                    ? formatDistanceToNow(new Date(activity.lastMessageSent), { addSuffix: true })
-                    : "No messages yet"}
-                </p>
-              </div>
+          {/* Activity */}
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Activity</h2>
 
-              <div>
-                <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                  <FolderOpen className="w-4 h-4" />
-                  <span className="font-medium">Last File Download</span>
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                    <Activity className="w-4 h-4" />
+                    <span className="font-medium">Last Login</span>
+                  </div>
+                  <p className="text-sm text-gray-900 ml-6">
+                    {activity?.lastLogin
+                      ? formatDistanceToNow(new Date(activity.lastLogin), { addSuffix: true })
+                      : "Never"}
+                  </p>
                 </div>
-                <p className="text-sm text-gray-900 ml-6">
-                  {activity?.lastFileDownloaded
-                    ? formatDistanceToNow(new Date(activity.lastFileDownloaded), { addSuffix: true })
-                    : "No downloads yet"}
-                </p>
+
+                <div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                    <Mail className="w-4 h-4" />
+                    <span className="font-medium">Last Message</span>
+                  </div>
+                  <p className="text-sm text-gray-900 ml-6">
+                    {activity?.lastMessageSent
+                      ? formatDistanceToNow(new Date(activity.lastMessageSent), { addSuffix: true })
+                      : "No messages yet"}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                    <FolderOpen className="w-4 h-4" />
+                    <span className="font-medium">Last File Download</span>
+                  </div>
+                  <p className="text-sm text-gray-900 ml-6">
+                    {activity?.lastFileDownloaded
+                      ? formatDistanceToNow(new Date(activity.lastFileDownloaded), { addSuffix: true })
+                      : "No downloads yet"}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
