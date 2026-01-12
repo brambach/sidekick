@@ -116,7 +116,7 @@ export function AddClientDialog() {
             <Input
               id="companyName"
               required
-              placeholder="Global Dynamics Inc."
+              placeholder="Acme Healthcare Partners"
               value={formData.companyName}
               onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
             />
@@ -127,7 +127,7 @@ export function AddClientDialog() {
             <Input
               id="contactName"
               required
-              placeholder="Amanda Torres"
+              placeholder="Sarah Johnson"
               value={formData.contactName}
               onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
             />
@@ -139,7 +139,7 @@ export function AddClientDialog() {
               id="contactEmail"
               type="email"
               required
-              placeholder="amanda@globaldynamics.com"
+              placeholder="sarah.johnson@acmehealthcare.com"
               value={formData.contactEmail}
               onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
             />

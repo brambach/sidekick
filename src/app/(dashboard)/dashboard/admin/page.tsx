@@ -43,7 +43,7 @@ export default async function AdminDashboard() {
       <div className="mb-8 flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">Admin Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">Overview of your agency&apos;s client portal.</p>
+          <p className="text-sm text-gray-500 mt-1">Manage HiBob implementations and client projects.</p>
         </div>
         <InviteTeamMemberDialog />
       </div>

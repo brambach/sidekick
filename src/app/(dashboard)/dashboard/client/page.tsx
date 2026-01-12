@@ -41,7 +41,7 @@ export default async function ClientDashboard() {
     return (
       <div className="max-w-[1200px] mx-auto p-6">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-          <p className="text-yellow-800">No client profile found. Please contact your agency.</p>
+          <p className="text-yellow-800">No client profile found. Please contact Digital Directions support.</p>
         </div>
       </div>
     );
@@ -151,7 +151,7 @@ export default async function ClientDashboard() {
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-12 text-center">
             <FolderOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" strokeWidth={1.5} />
             <p className="text-gray-500 text-lg font-medium mb-2">No projects yet</p>
-            <p className="text-gray-400 text-sm">Your agency will create projects for you to view here.</p>
+            <p className="text-gray-400 text-sm">Your Digital Directions consultant will set up projects for you.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -211,6 +211,73 @@ async function seed() {
 
     console.log("✓ Created client activity records");
 
+    // Create realistic messages between DD consultants and clients
+    await db.insert(messages).values([
+      // Project 1: HiBob → ADP Payroll Integration (Meridian)
+      {
+        projectId: project1.id,
+        userId: adminUser.id,
+        content:
+          "Hi Jennifer! We've completed the initial mapping between HiBob and ADP. The test payroll file ran successfully with all 247 employees. Ready to schedule a call to review the validation report?",
+        read: true,
+        createdAt: fiveDaysAgo,
+      },
+      {
+        projectId: project1.id,
+        userId: meridianUser.id,
+        content:
+          "That's great news! I reviewed the report - everything looks accurate. Can we meet Thursday at 2pm to discuss the go-live plan?",
+        read: true,
+        createdAt: twoDaysAgo,
+      },
+      {
+        projectId: project1.id,
+        userId: adminUser.id,
+        content:
+          "Thursday at 2pm works perfectly. I'll send a calendar invite with the agenda. We'll cover the cutover timeline and rollback procedures.",
+        read: false,
+        createdAt: oneDayAgo,
+      },
+
+      // Project 2: HiBob Onboarding Workflow (Pinnacle)
+      {
+        projectId: project2.id,
+        userId: adminUser.id,
+        content:
+          "Robert, the onboarding workflow is now live in your sandbox environment. I've created 2 test employees so you can walk through the full process. Let me know when you're ready for a demo!",
+        read: true,
+        createdAt: fiveDaysAgo,
+      },
+      {
+        projectId: project2.id,
+        userId: pinnacleUser.id,
+        content:
+          "I walked through both test cases - this is exactly what we need! The document e-signatures and equipment request integrations are working perfectly. When can we move this to production?",
+        read: true,
+        createdAt: twoDaysAgo,
+      },
+
+      // Project 3: HiBob → Greenhouse ATS Sync (Atlas) - Completed
+      {
+        projectId: project3.id,
+        userId: adminUser.id,
+        content:
+          "Sarah, I'm pleased to confirm the Greenhouse integration is complete! All new hires from your ATS will automatically sync to HiBob within 15 minutes. I've attached the final integration documentation.",
+        read: true,
+        createdAt: oneMonthAgo,
+      },
+      {
+        projectId: project3.id,
+        userId: atlasUser.id,
+        content:
+          "Fantastic work! Our recruiting team is already seeing the time savings. Thank you for the excellent support throughout this project.",
+        read: true,
+        createdAt: oneMonthAgo,
+      },
+    ]);
+
+    console.log("✓ Created realistic consultant messages");
+
     console.log("");
     console.log("✅ Seed completed successfully!");
     console.log("");
@@ -219,6 +286,7 @@ async function seed() {
     console.log("  - 4 clients (Meridian Healthcare, Pinnacle Financial, Atlas Manufacturing, Horizon Tech)");
     console.log("  - 4 users (1 admin, 3 client users)");
     console.log("  - 4 HiBob integration projects (various statuses, including 1 overdue)");
+    console.log("  - 7 realistic consultant-client messages");
     console.log("  - 4 client activity records");
     console.log("");
     console.log("Note: Horizon Tech is an edge case client with:");

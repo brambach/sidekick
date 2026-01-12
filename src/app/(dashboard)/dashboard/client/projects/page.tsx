@@ -16,7 +16,7 @@ export default async function ClientProjectsPage() {
         </CardHeader>
         <CardContent>
           <p className="text-gray-500">
-            No projects assigned yet. Your agency will share projects with you.
+            No projects assigned yet. Your Digital Directions consultant will set up projects for you.
           </p>
         </CardContent>
       </Card>
