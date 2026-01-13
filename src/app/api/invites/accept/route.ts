@@ -49,8 +49,12 @@ export async function POST(req: NextRequest) {
       .limit(1);
 
     if (existingUser) {
-      // Check if user already has a different role or clientId
-      if (existingUser.role !== invite.role || existingUser.clientId !== invite.clientId) {
+      // Check if user already has a different role or clientId (and not default client role)
+      const isDifferentRole = existingUser.role !== invite.role;
+      const isDifferentClient = existingUser.clientId !== invite.clientId;
+      const hasBeenConfigured = existingUser.role !== "client" || existingUser.clientId !== null;
+
+      if ((isDifferentRole || isDifferentClient) && hasBeenConfigured) {
         return NextResponse.json(
           {
             error: "Account conflict: You already have an account with a different role. Please contact support or sign out and create a new account.",
@@ -63,28 +67,51 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // If role and clientId match, just mark invite as accepted (idempotent)
+      // Update user with invite details (handles webhook-created users)
       await db
-        .update(invites)
+        .update(users)
         .set({
-          status: "accepted",
-          acceptedAt: new Date(),
+          role: invite.role,
+          clientId: invite.clientId,
+          updatedAt: new Date(),
         })
-        .where(eq(invites.id, invite.id));
-
-      return NextResponse.json({
-        success: true,
-        role: invite.role,
-        message: "Invite already accepted",
-      });
+        .where(eq(users.id, existingUser.id));
     } else {
-      // Create new user
-      await db.insert(users).values({
-        clerkId: userId,
-        role: invite.role,
-        clientId: invite.clientId,
-        agencyId: null,
-      });
+      // Create new user - use try/catch for race condition with webhook
+      try {
+        await db.insert(users).values({
+          clerkId: userId,
+          role: invite.role,
+          clientId: invite.clientId,
+          agencyId: null,
+        });
+      } catch (insertError: any) {
+        // Handle duplicate key error from webhook race condition
+        if (insertError?.code === "23505") {
+          console.log("User already exists (created by webhook), updating instead...");
+          // Fetch the user that was just created
+          const [webhookUser] = await db
+            .select()
+            .from(users)
+            .where(eq(users.clerkId, userId))
+            .limit(1);
+
+          if (webhookUser) {
+            // Update with invite details
+            await db
+              .update(users)
+              .set({
+                role: invite.role,
+                clientId: invite.clientId,
+                updatedAt: new Date(),
+              })
+              .where(eq(users.id, webhookUser.id));
+          }
+        } else {
+          // Re-throw other errors
+          throw insertError;
+        }
+      }
     }
 
     // Update Clerk metadata
