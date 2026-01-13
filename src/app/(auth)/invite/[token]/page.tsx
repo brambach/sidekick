@@ -221,6 +221,7 @@ export default function InvitePage() {
         </div>
 
         <SignUp
+          routing="hash"
           appearance={{
             elements: {
               rootBox: "mx-auto",

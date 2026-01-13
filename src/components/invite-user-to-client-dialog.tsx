@@ -60,8 +60,14 @@ export function InviteUserToClientDialog({ clientId, companyName }: InviteUserTo
       toast.success(`Invite sent to ${email}! They'll receive an email with signup instructions.`);
 
       setEmail("");
-      setOpen(false);
+
+      // Refresh the page data first, then close the dialog
       router.refresh();
+
+      // Small delay to ensure the refresh completes before closing
+      setTimeout(() => {
+        setOpen(false);
+      }, 100);
     } catch (error) {
       console.error("Error sending invite:", error);
       // Error already handled above with better messaging
