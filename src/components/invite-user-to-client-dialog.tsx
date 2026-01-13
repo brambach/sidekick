@@ -73,8 +73,8 @@ export function InviteUserToClientDialog({ clientId, companyName }: InviteUserTo
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2 shadow-sm text-sm font-medium">
-          <UserPlus className="w-4 h-4" strokeWidth={1.5} />
+        <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg transition-all hover:bg-indigo-700 flex items-center gap-2 text-sm font-medium shadow-sm">
+          <UserPlus className="w-4 h-4" strokeWidth={2.5} />
           <span>Invite User</span>
         </button>
       </DialogTrigger>
@@ -96,7 +96,7 @@ export function InviteUserToClientDialog({ clientId, companyName }: InviteUserTo
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-400">
               They'll receive an email with a signup link that expires in 7 days.
             </p>
           </div>
@@ -105,14 +105,14 @@ export function InviteUserToClientDialog({ clientId, companyName }: InviteUserTo
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors border border-slate-200"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg transition-all hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               disabled={loading}
             >
               {loading ? "Sending..." : "Send Invite"}

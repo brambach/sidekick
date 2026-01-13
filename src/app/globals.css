@@ -64,6 +64,128 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#F9FAFF] text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-700;
+    font-family: 'Geist', 'Inter', sans-serif;
   }
+}
+
+/* Glass Panel Utility (not used in light theme but keeping for compatibility) */
+@layer utilities {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .nav-glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animation Keyframes */
+@keyframes animationIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+/* Animation on Scroll */
+.animate-on-scroll {
+  animation-play-state: paused !important;
+}
+
+.animate-on-scroll.animate {
+  animation-play-state: running !important;
+}
+
+/* Glow Button Effect */
+:root {
+  --glow-core: rgba(255, 255, 255, 0.8);
+  --glow-color: rgba(99, 102, 241, 0.35);
+  --glow-color-strong: rgba(99, 102, 241, 0.55);
+}
+
+.glow-btn {
+  --x: 50%;
+  --y: 50%;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  appearance: none;
+  background: #fff;
+  color: #0f172a;
+  padding: 10px 24px;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  letter-spacing: -0.025em;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  isolation: isolate;
+  font-family: inherit;
+  font-size: 0.875rem;
+  overflow: hidden;
+}
+
+.glow-btn:hover {
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+}
+
+.glow-btn::before,
+.glow-btn::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease;
+  will-change: background;
+  z-index: -1;
+}
+
+.glow-btn::before {
+  background: radial-gradient(90px 90px at var(--x) var(--y), var(--glow-core) 0%, rgba(255, 255, 255, 0.25) 45%, transparent 70%), radial-gradient(140px 140px at var(--x) var(--y), var(--glow-color-strong) 0%, transparent 75%);
+  mix-blend-mode: screen;
+}
+
+.glow-btn::after {
+  inset: -8px;
+  border-radius: inherit;
+  background: radial-gradient(200px 200px at var(--x) var(--y), var(--glow-color) 0%, transparent 80%);
+  filter: blur(20px);
+  z-index: -2;
+}
+
+.glow-btn:hover::before,
+.glow-btn:hover::after {
+  opacity: 1;
 }

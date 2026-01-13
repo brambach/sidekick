@@ -13,11 +13,11 @@ interface UpdateStatusDialogProps {
 }
 
 const statuses = [
-  { value: "planning", label: "Planning", color: "bg-gray-100 text-gray-700 border-gray-200" },
-  { value: "in_progress", label: "In Progress", color: "bg-purple-50 text-purple-700 border-purple-100" },
-  { value: "review", label: "In Review", color: "bg-purple-50 text-purple-700 border-purple-100" },
-  { value: "completed", label: "Completed", color: "bg-green-50 text-green-700 border-green-100" },
-  { value: "on_hold", label: "On Hold", color: "bg-orange-50 text-orange-700 border-orange-100" },
+  { value: "planning", label: "Planning", color: "bg-slate-50 text-slate-600 border-slate-200" },
+  { value: "in_progress", label: "In Progress", color: "bg-indigo-50 text-indigo-600 border-indigo-200" },
+  { value: "review", label: "In Review", color: "bg-purple-50 text-purple-600 border-purple-200" },
+  { value: "completed", label: "Completed", color: "bg-emerald-50 text-emerald-600 border-emerald-200" },
+  { value: "on_hold", label: "On Hold", color: "bg-orange-50 text-orange-600 border-orange-200" },
 ];
 
 export function UpdateStatusDialog({ projectId, currentStatus }: UpdateStatusDialogProps) {
@@ -55,7 +55,7 @@ export function UpdateStatusDialog({ projectId, currentStatus }: UpdateStatusDia
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors text-sm font-medium">
+        <button className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg transition-all hover:bg-indigo-700 text-sm font-medium shadow-sm">
           Update Status
         </button>
       </DialogTrigger>
@@ -72,10 +72,10 @@ export function UpdateStatusDialog({ projectId, currentStatus }: UpdateStatusDia
                   key={status.value}
                   type="button"
                   onClick={() => setSelectedStatus(status.value)}
-                  className={`w-full text-left px-4 py-3 rounded-md border transition-colors ${
+                  className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
                     selectedStatus === status.value
-                      ? `${status.color} ring-2 ring-offset-2 ring-blue-500`
-                      : "bg-white border-gray-200 hover:bg-gray-50"
+                      ? `${status.color} ring-2 ring-indigo-500`
+                      : "bg-white border-slate-200 hover:bg-slate-50 text-slate-600"
                   }`}
                 >
                   <span className="font-medium">{status.label}</span>
@@ -84,13 +84,22 @@ export function UpdateStatusDialog({ projectId, currentStatus }: UpdateStatusDia
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors border border-slate-200"
+              disabled={loading}
+            >
               Cancel
-            </Button>
-            <Button type="submit" disabled={loading}>
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg transition-all hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              disabled={loading}
+            >
               {loading ? "Updating..." : "Update Status"}
-            </Button>
+            </button>
           </div>
         </form>
       </DialogContent>

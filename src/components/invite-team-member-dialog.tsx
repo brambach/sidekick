@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { GlowButton } from "@/components/glow-button";
 
 export function InviteTeamMemberDialog() {
   const router = useRouter();
@@ -55,15 +56,15 @@ export function InviteTeamMemberDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2 shadow-sm text-sm font-medium">
-          <UserPlus className="w-[18px] h-[18px]" strokeWidth={1.5} />
+        <GlowButton>
+          <UserPlus className="w-4 h-4" />
           <span>Invite Team Member</span>
-        </button>
+        </GlowButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white border border-slate-200">
         <DialogHeader>
-          <DialogTitle>Invite Team Member</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-900">Invite Team Member</DialogTitle>
+          <DialogDescription className="text-slate-500">
             Send an invitation to join your team as an admin. They'll receive an email with a signup link.
           </DialogDescription>
         </DialogHeader>
@@ -78,7 +79,7 @@ export function InviteTeamMemberDialog() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-400">
               They'll be able to manage clients, projects, and provide support.
             </p>
           </div>
@@ -87,14 +88,14 @@ export function InviteTeamMemberDialog() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-full transition-colors border border-slate-200"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-full transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? "Sending..." : "Send Invite"}

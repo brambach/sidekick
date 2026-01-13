@@ -6,32 +6,32 @@ interface TicketStatusBadgeProps {
 const statusStyles = {
   open: {
     bg: "bg-yellow-50",
-    text: "text-yellow-700",
+    text: "text-yellow-600",
     border: "border-yellow-200",
     label: "Open",
   },
   in_progress: {
-    bg: "bg-purple-50",
-    text: "text-purple-700",
-    border: "border-purple-200",
+    bg: "bg-indigo-50",
+    text: "text-indigo-600",
+    border: "border-indigo-200",
     label: "In Progress",
   },
   waiting_on_client: {
     bg: "bg-orange-50",
-    text: "text-orange-700",
+    text: "text-orange-600",
     border: "border-orange-200",
     label: "Waiting on Client",
   },
   resolved: {
-    bg: "bg-green-50",
-    text: "text-green-700",
-    border: "border-green-200",
+    bg: "bg-emerald-50",
+    text: "text-emerald-600",
+    border: "border-emerald-200",
     label: "Resolved",
   },
   closed: {
-    bg: "bg-gray-100",
-    text: "text-gray-600",
-    border: "border-gray-200",
+    bg: "bg-slate-50",
+    text: "text-slate-600",
+    border: "border-slate-200",
     label: "Closed",
   },
 };
@@ -56,15 +56,15 @@ interface TicketPriorityBadgeProps {
 
 const priorityStyles = {
   low: {
-    bg: "bg-gray-50",
-    text: "text-gray-600",
-    border: "border-gray-200",
+    bg: "bg-slate-50",
+    text: "text-slate-600",
+    border: "border-slate-200",
     label: "Low",
   },
   medium: {
-    bg: "bg-purple-50",
-    text: "text-purple-600",
-    border: "border-purple-200",
+    bg: "bg-blue-50",
+    text: "text-blue-600",
+    border: "border-blue-200",
     label: "Medium",
   },
   high: {
@@ -101,8 +101,8 @@ interface TicketTypeBadgeProps {
 
 const typeStyles = {
   general_support: {
-    bg: "bg-purple-50",
-    text: "text-purple-600",
+    bg: "bg-indigo-50",
+    text: "text-indigo-600",
     label: "Support",
   },
   project_issue: {
@@ -111,8 +111,8 @@ const typeStyles = {
     label: "Project Issue",
   },
   feature_request: {
-    bg: "bg-green-50",
-    text: "text-green-600",
+    bg: "bg-emerald-50",
+    text: "text-emerald-600",
     label: "Feature Request",
   },
   bug_report: {

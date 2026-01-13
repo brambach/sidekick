@@ -5,7 +5,8 @@ import { eq, isNull, and, desc, or } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TicketList } from "@/components/ticket-card";
 import { CreateTicketDialog } from "@/components/create-ticket-dialog";
-import { Ticket } from "lucide-react";
+import { Ticket, LayoutGrid } from "lucide-react";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
 export const dynamic = "force-dynamic";
 
@@ -107,68 +108,92 @@ export default async function AdminTicketsPage() {
   const resolvedTickets = enrichedTickets.filter((t) => t.status === "resolved" || t.status === "closed");
 
   return (
-    <div className="max-w-[1200px] mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-900 tracking-tight flex items-center gap-3">
-            <Ticket className="w-8 h-8" />
-            Tickets
-          </h1>
-          <p className="text-gray-500 mt-1">Manage support tickets from your clients</p>
+    <>
+      <AnimateOnScroll />
+      <div className="px-6 lg:px-8 py-10 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.1s_both]">
+          <div className="max-w-2xl">
+            <h1 className="text-[32px] font-semibold text-slate-900 tracking-tight mb-2 flex items-center gap-3">
+              <Ticket className="w-7 h-7 text-indigo-600" />
+              Tickets Overview
+            </h1>
+            <p className="text-slate-500 text-[15px] leading-relaxed font-light">
+              Manage support tickets and customer requests across all clients.
+            </p>
+          </div>
+          <CreateTicketDialog clients={allClients} projects={allProjects} isAdmin />
         </div>
-        <CreateTicketDialog clients={allClients} projects={allProjects} isAdmin />
-      </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <p className="text-sm font-medium text-gray-500">Open</p>
-          <p className="text-2xl font-semibold text-yellow-600">{openTickets.length}</p>
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-12">
+          <div className="bg-white rounded-2xl p-6 border border-amber-50 shadow-[0_4px_20px_-4px_rgba(245,158,11,0.05)] animate-on-scroll [animation:animationIn_0.5s_ease-out_0.2s_both]">
+            <p className="text-[11px] font-semibold text-amber-600 uppercase tracking-widest mb-2">Open</p>
+            <p className="text-[32px] font-medium text-slate-900 tracking-tight">{openTickets.length}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-indigo-50 shadow-[0_4px_20px_-4px_rgba(99,102,241,0.05)] animate-on-scroll [animation:animationIn_0.5s_ease-out_0.3s_both]">
+            <p className="text-[11px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">In Progress</p>
+            <p className="text-[32px] font-medium text-slate-900 tracking-tight">{inProgressTickets.length}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-emerald-50 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.05)] animate-on-scroll [animation:animationIn_0.5s_ease-out_0.4s_both]">
+            <p className="text-[11px] font-semibold text-emerald-600 uppercase tracking-widest mb-2">Resolved</p>
+            <p className="text-[32px] font-medium text-slate-900 tracking-tight">{resolvedTickets.length}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] animate-on-scroll [animation:animationIn_0.5s_ease-out_0.5s_both]">
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-2">Total</p>
+            <p className="text-[32px] font-medium text-slate-900 tracking-tight">{enrichedTickets.length}</p>
+          </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <p className="text-sm font-medium text-gray-500">In Progress</p>
-          <p className="text-2xl font-semibold text-purple-600">{inProgressTickets.length}</p>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <p className="text-sm font-medium text-gray-500">Resolved</p>
-          <p className="text-2xl font-semibold text-green-600">{resolvedTickets.length}</p>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-          <p className="text-sm font-medium text-gray-500">Total</p>
-          <p className="text-2xl font-semibold text-gray-900">{enrichedTickets.length}</p>
-        </div>
-      </div>
 
-      {/* Open Tickets */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Open Tickets ({openTickets.length})</h2>
-        <TicketList
-          tickets={openTickets}
-          basePath="/dashboard/admin/tickets"
-          emptyMessage="No open tickets"
-        />
-      </div>
-
-      {/* In Progress */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">In Progress ({inProgressTickets.length})</h2>
-        <TicketList
-          tickets={inProgressTickets}
-          basePath="/dashboard/admin/tickets"
-          emptyMessage="No tickets in progress"
-        />
-      </div>
-
-      {/* Resolved */}
-      {resolvedTickets.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recently Resolved ({resolvedTickets.length})</h2>
+        {/* Open Tickets Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.6s_both]">
+            <LayoutGrid className="w-4 h-4 text-amber-500" />
+            <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+              Open Tickets ({openTickets.length})
+            </h2>
+            <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+          </div>
           <TicketList
-            tickets={resolvedTickets.slice(0, 5)}
+            tickets={openTickets}
             basePath="/dashboard/admin/tickets"
+            emptyMessage="No open tickets"
           />
         </div>
-      )}
-    </div>
+
+        {/* In Progress Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.7s_both]">
+            <LayoutGrid className="w-4 h-4 text-indigo-500" />
+            <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+              In Progress ({inProgressTickets.length})
+            </h2>
+            <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+          </div>
+          <TicketList
+            tickets={inProgressTickets}
+            basePath="/dashboard/admin/tickets"
+            emptyMessage="No tickets in progress"
+          />
+        </div>
+
+        {/* Resolved Section */}
+        {resolvedTickets.length > 0 && (
+          <div className="pb-12">
+            <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.8s_both]">
+              <LayoutGrid className="w-4 h-4 text-emerald-500" />
+              <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+                Recently Resolved ({resolvedTickets.length})
+              </h2>
+              <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+            </div>
+            <TicketList
+              tickets={resolvedTickets.slice(0, 5)}
+              basePath="/dashboard/admin/tickets"
+            />
+          </div>
+        )}
+      </div>
+    </>
   );
 }

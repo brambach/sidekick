@@ -61,11 +61,11 @@ export function ClientStatusMenu({ clientId, currentStatus, companyName }: Clien
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
-            className="p-1.5 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-1.5 hover:bg-slate-50 rounded-md transition-colors"
             disabled={loading}
             aria-label="Change client status"
           >
-            <MoreVertical className="w-4 h-4 text-gray-500" strokeWidth={1.5} />
+            <MoreVertical className="w-4 h-4 text-slate-400" strokeWidth={1.5} />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
@@ -74,7 +74,7 @@ export function ClientStatusMenu({ clientId, currentStatus, companyName }: Clien
             disabled={currentStatus === "active" || loading}
             className="cursor-pointer"
           >
-            <CheckCircle className="w-4 h-4 mr-2 text-green-600" strokeWidth={1.5} />
+            <CheckCircle className="w-4 h-4 mr-2 text-emerald-600" strokeWidth={1.5} />
             <span>Mark as Active</span>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -82,7 +82,7 @@ export function ClientStatusMenu({ clientId, currentStatus, companyName }: Clien
             disabled={currentStatus === "inactive" || loading}
             className="cursor-pointer"
           >
-            <XCircle className="w-4 h-4 mr-2 text-gray-500" strokeWidth={1.5} />
+            <XCircle className="w-4 h-4 mr-2 text-slate-400" strokeWidth={1.5} />
             <span>Mark as Inactive</span>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -90,7 +90,7 @@ export function ClientStatusMenu({ clientId, currentStatus, companyName }: Clien
             disabled={currentStatus === "archived" || loading}
             className="cursor-pointer"
           >
-            <Archive className="w-4 h-4 mr-2 text-gray-600" strokeWidth={1.5} />
+            <Archive className="w-4 h-4 mr-2 text-slate-400" strokeWidth={1.5} />
             <span>Archive</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

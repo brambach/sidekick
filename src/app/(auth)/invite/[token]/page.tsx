@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { SignUp, useUser, useSignUp } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
-import Image from "next/image";
+import { Loader2, ChevronRight } from "lucide-react";
 
 interface InviteData {
   email: string;
@@ -106,8 +105,8 @@ export default function InvitePage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-600" />
-          <p className="mt-4 text-gray-600">Validating your invite...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-500" />
+          <p className="mt-4 text-slate-400">Validating your invite...</p>
         </div>
       </div>
     );
@@ -117,17 +116,18 @@ export default function InvitePage() {
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="max-w-md w-full text-center">
-          <div className="bg-white rounded-lg border border-red-200 p-8">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">❌</span>
+          <div className="glass-panel rounded-2xl p-8">
+            <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">❌</span>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Invalid Invite</h1>
-            <p className="text-gray-600 mb-6">{error}</p>
+            <h1 className="text-2xl font-bold text-white mb-2">Invalid Invite</h1>
+            <p className="text-slate-400 mb-6">{error}</p>
             <a
               href="/"
-              className="inline-block px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full hover:shadow-[0_0_25px_-5px_rgba(255,255,255,0.5)] hover:-translate-y-0.5 transition-all font-semibold"
             >
               Go to Home
+              <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
             </a>
           </div>
         </div>
@@ -139,39 +139,39 @@ export default function InvitePage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-purple-600" />
-          <p className="mt-4 text-gray-600">Setting up your account...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-500" />
+          <p className="mt-4 text-slate-400">Setting up your account...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-gray-50">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Image
-            src="/images/dd-logo.png"
-            alt="Digital Directions"
-            width={160}
-            height={40}
-            className="mx-auto mb-4"
-          />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          {/* Logo */}
+          <div className="flex items-center justify-center mb-6">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-[0_0_20px_-5px_rgba(124,58,237,0.5)]">
+              <ChevronRight className="text-white w-6 h-6 relative left-[1px]" strokeWidth={2.5} />
+            </div>
+          </div>
+
+          <h1 className="text-3xl font-bold text-white mb-2 bg-gradient-to-br from-white via-white to-slate-400 bg-clip-text text-transparent">
             Welcome to Digital Directions!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-slate-400 mb-4">
             You've been invited to join as a{" "}
-            <strong>{invite?.role === "admin" ? "team member" : "client"}</strong>
+            <strong className="text-indigo-400">{invite?.role === "admin" ? "team member" : "client"}</strong>
             {invite?.clientName && (
               <>
                 {" "}
-                for <strong>{invite.clientName}</strong>
+                for <strong className="text-indigo-400">{invite.clientName}</strong>
               </>
             )}
           </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Email: <strong>{invite?.email}</strong>
+          <p className="text-sm text-slate-500">
+            Email: <strong className="text-slate-400">{invite?.email}</strong>
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export default function InvitePage() {
           appearance={{
             elements: {
               rootBox: "mx-auto",
-              card: "shadow-lg",
+              card: "glass-panel shadow-2xl border-white/10",
             },
           }}
           afterSignUpUrl={`/api/invites/accept?token=${token}`}
@@ -187,9 +187,9 @@ export default function InvitePage() {
           redirectUrl={`/api/invites/accept?token=${token}`}
         />
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-slate-500 mt-6">
           Already have an account?{" "}
-          <a href="/sign-in" className="text-purple-600 hover:text-purple-700 font-medium">
+          <a href="/sign-in" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
             Sign in
           </a>
         </p>

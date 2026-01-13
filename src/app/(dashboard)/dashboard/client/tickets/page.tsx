@@ -5,7 +5,8 @@ import { eq, isNull, and, desc, or } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TicketList } from "@/components/ticket-card";
 import { CreateTicketDialog } from "@/components/create-ticket-dialog";
-import { Ticket } from "lucide-react";
+import { Ticket, LayoutGrid } from "lucide-react";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,10 @@ export default async function ClientTicketsPage() {
 
   if (!user.clientId) {
     return (
-      <div className="max-w-[1200px] mx-auto p-6">
-        <p className="text-gray-500">You don&apos;t have access to support tickets.</p>
+      <div className="px-6 lg:px-8 py-10 max-w-7xl mx-auto">
+        <div className="bg-white border-amber-200 rounded-2xl p-6 text-center border shadow-sm">
+          <p className="text-amber-600">You don&apos;t have access to support tickets.</p>
+        </div>
       </div>
     );
   }
@@ -109,43 +112,61 @@ export default async function ClientTicketsPage() {
   const resolvedTickets = enrichedTickets.filter((t) => t.status === "resolved" || t.status === "closed");
 
   return (
-    <div className="max-w-[1200px] mx-auto p-6">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-900 tracking-tight flex items-center gap-3">
-            <Ticket className="w-8 h-8" />
-            Support
-          </h1>
-          <p className="text-gray-500 mt-1">View and create support tickets</p>
-        </div>
-        <CreateTicketDialog
-          projects={clientProjects}
-          defaultClientId={user.clientId}
-        />
-      </div>
-
-      {/* Active Tickets */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Active Tickets ({activeTickets.length})</h2>
-        <TicketList
-          tickets={activeTickets}
-          basePath="/dashboard/client/tickets"
-          showClient={false}
-          emptyMessage="No active tickets. Create one if you need help!"
-        />
-      </div>
-
-      {/* Resolved Tickets */}
-      {resolvedTickets.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Resolved ({resolvedTickets.length})</h2>
-          <TicketList
-            tickets={resolvedTickets}
-            basePath="/dashboard/client/tickets"
-            showClient={false}
+    <>
+      <AnimateOnScroll />
+      <div className="px-6 lg:px-8 py-10 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-12 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.1s_both]">
+          <div className="max-w-2xl">
+            <h1 className="text-[32px] font-semibold text-slate-900 tracking-tight mb-2 flex items-center gap-3">
+              <Ticket className="w-7 h-7 text-indigo-600" />
+              Support
+            </h1>
+            <p className="text-slate-500 text-[15px] leading-relaxed font-light">
+              View your support tickets and create new ones if you need help.
+            </p>
+          </div>
+          <CreateTicketDialog
+            projects={clientProjects}
+            defaultClientId={user.clientId}
           />
         </div>
-      )}
-    </div>
+
+        {/* Active Tickets */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.2s_both]">
+            <LayoutGrid className="w-4 h-4 text-indigo-500" />
+            <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+              Active Tickets ({activeTickets.length})
+            </h2>
+            <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+          </div>
+          <TicketList
+            tickets={activeTickets}
+            basePath="/dashboard/client/tickets"
+            showClient={false}
+            emptyMessage="No active tickets. Create one if you need help!"
+          />
+        </div>
+
+        {/* Resolved Tickets */}
+        {resolvedTickets.length > 0 && (
+          <div className="pb-12">
+            <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.3s_both]">
+              <LayoutGrid className="w-4 h-4 text-emerald-500" />
+              <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
+                Resolved ({resolvedTickets.length})
+              </h2>
+              <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+            </div>
+            <TicketList
+              tickets={resolvedTickets}
+              basePath="/dashboard/client/tickets"
+              showClient={false}
+            />
+          </div>
+        )}
+      </div>
+    </>
   );
 }

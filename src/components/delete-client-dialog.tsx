@@ -60,34 +60,34 @@ export function DeleteClientDialog({
           <AlertDialogTitle>Permanently Delete Client?</AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="space-y-3">
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-slate-700">
                 Are you sure you want to permanently delete <span className="text-red-600">{companyName}</span>?
               </p>
-              <p>
+              <p className="text-slate-600">
                 This action <span className="font-semibold text-red-600">cannot be undone</span>. All
                 associated data will be permanently removed:
               </p>
-              <ul className="list-disc list-inside space-y-1 text-sm">
+              <ul className="list-disc list-inside space-y-1 text-sm text-slate-500">
                 <li>All projects</li>
                 <li>All files and documents</li>
                 <li>All messages and conversations</li>
                 <li>All support tickets</li>
                 <li>Activity history</li>
               </ul>
-              <p className="font-medium pt-2">
+              <p className="font-medium pt-2 text-slate-700">
                 If you just want to pause the relationship, consider marking them as{" "}
-                <span className="text-gray-600">Inactive</span> or{" "}
-                <span className="text-gray-600">Archived</span> instead.
+                <span className="text-slate-600">Inactive</span> or{" "}
+                <span className="text-slate-600">Archived</span> instead.
               </p>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading} className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors border border-slate-200">Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={loading}
-            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg transition-all disabled:opacity-50 shadow-sm"
           >
             {loading ? "Deleting..." : "Yes, Delete Permanently"}
           </AlertDialogAction>

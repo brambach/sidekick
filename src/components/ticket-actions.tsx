@@ -60,7 +60,7 @@ export function ClaimTicketButton({ ticketId }: { ticketId: string }) {
     <button
       onClick={handleClaim}
       disabled={loading}
-      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded-md transition-colors disabled:opacity-50"
+      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-all disabled:opacity-50"
     >
       <UserPlus className="w-4 h-4" />
       {loading ? "Claiming..." : "Claim Ticket"}
@@ -97,7 +97,7 @@ export function UnclaimTicketButton({ ticketId }: { ticketId: string }) {
     <button
       onClick={handleUnclaim}
       disabled={loading}
-      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50"
+      className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-all disabled:opacity-50"
     >
       <UserMinus className="w-4 h-4" />
       {loading ? "Unclaiming..." : "Unclaim Ticket"}
@@ -138,7 +138,7 @@ export function UpdateStatusButton({ ticketId, currentStatus }: { ticketId: stri
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+        <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg transition-all">
           <Clock className="w-4 h-4" />
           Update Status
         </button>
@@ -164,13 +164,22 @@ export function UpdateStatusButton({ ticketId, currentStatus }: { ticketId: stri
             </Select>
           </div>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors border border-slate-200"
+            >
               Cancel
-            </Button>
-            <Button onClick={handleUpdate} disabled={loading}>
+            </button>
+            <button
+              onClick={handleUpdate}
+              disabled={loading}
+              className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg transition-all hover:bg-indigo-700 disabled:opacity-50 shadow-sm"
+            >
               {loading ? "Updating..." : "Update"}
-            </Button>
+            </button>
           </div>
         </div>
       </DialogContent>
@@ -217,7 +226,7 @@ export function ResolveTicketDialog({ ticketId }: { ticketId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors">
+        <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all">
           <CheckCircle className="w-4 h-4" />
           Resolve
         </button>
@@ -241,23 +250,32 @@ export function ResolveTicketDialog({ ticketId }: { ticketId: string }) {
             />
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-gray-600">
+          <label className="flex items-center gap-2 text-sm text-slate-600">
             <input
               type="checkbox"
               checked={closeTicket}
               onChange={(e) => setCloseTicket(e.target.checked)}
-              className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
             />
             Close ticket (mark as fully completed)
           </label>
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              disabled={loading}
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors border border-slate-200"
+            >
               Cancel
-            </Button>
-            <Button onClick={handleResolve} disabled={loading || !resolution.trim()}>
+            </button>
+            <button
+              onClick={handleResolve}
+              disabled={loading || !resolution.trim()}
+              className="px-5 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg transition-all hover:bg-indigo-700 disabled:opacity-50 shadow-sm"
+            >
               {loading ? "Resolving..." : closeTicket ? "Close Ticket" : "Mark Resolved"}
-            </Button>
+            </button>
           </div>
         </div>
       </DialogContent>

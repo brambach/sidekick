@@ -4,10 +4,11 @@ import { clients, projects, clientActivity, users, invites } from "@/lib/db/sche
 import { eq, isNull, and, gt } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon, MailCheck } from "lucide-react";
+import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon, MailCheck, LayoutGrid } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { AddProjectDialog } from "@/components/add-project-dialog";
 import { InviteUserToClientDialog } from "@/components/invite-user-to-client-dialog";
+import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +16,13 @@ export const dynamic = "force-dynamic";
 function getStatusBadge(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case "active":
-      return { bg: "bg-green-50", text: "text-green-700", border: "border-green-100", label: "Active" };
+      return { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", label: "Active" };
     case "inactive":
-      return { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-200", label: "Inactive" };
+      return { bg: "bg-slate-100", text: "text-slate-500", border: "border-slate-200", label: "Inactive" };
     case "archived":
-      return { bg: "bg-red-50", text: "text-red-700", border: "border-red-100", label: "Archived" };
+      return { bg: "bg-white", text: "text-slate-400", border: "border-slate-200", label: "Archived" };
     default:
-      return { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-200", label: status };
+      return { bg: "bg-slate-100", text: "text-slate-500", border: "border-slate-200", label: status };
   }
 }
 
@@ -29,17 +30,17 @@ function getStatusBadge(status: string): { bg: string; text: string; border: str
 function getProjectStatusBadge(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case "in_progress":
-      return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Progress" };
+      return { bg: "bg-indigo-50", text: "text-indigo-600", border: "border-indigo-200", label: "In Progress" };
     case "review":
-      return { bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-100", label: "In Review" };
+      return { bg: "bg-purple-50", text: "text-purple-600", border: "border-purple-200", label: "In Review" };
     case "completed":
-      return { bg: "bg-green-50", text: "text-green-700", border: "border-green-100", label: "Completed" };
+      return { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", label: "Completed" };
     case "on_hold":
-      return { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-100", label: "On Hold" };
+      return { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", label: "On Hold" };
     case "planning":
-      return { bg: "bg-gray-100", text: "text-gray-700", border: "border-gray-200", label: "Planning" };
+      return { bg: "bg-slate-100", text: "text-slate-600", border: "border-slate-200", label: "Planning" };
     default:
-      return { bg: "bg-gray-100", text: "text-gray-600", border: "border-gray-200", label: status };
+      return { bg: "bg-slate-100", text: "text-slate-500", border: "border-slate-200", label: status };
   }
 }
 
@@ -119,259 +120,275 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const statusBadge = getStatusBadge(client.status);
 
   return (
-    <div className="max-w-[1200px] mx-auto p-6">
-      {/* Back Button */}
-      <Link
-        href="/dashboard/admin/clients"
-        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Clients
-      </Link>
+    <>
+      <AnimateOnScroll />
+      <div className="max-w-[1200px] mx-auto px-6 md:px-8 py-8 md:py-12">
+        {/* Back Button */}
+        <Link
+          href="/dashboard/admin/clients"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 mb-8 transition-colors [animation:animationIn_0.5s_ease-out_0s_both] animate-on-scroll"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Clients
+        </Link>
 
-      {/* Client Header */}
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-semibold text-gray-900 tracking-tight">{client.companyName}</h1>
-              <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge.bg} ${statusBadge.text} border ${statusBadge.border}`}
-              >
-                {statusBadge.label}
-              </span>
-            </div>
-            <div className="space-y-2 mt-4">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Building2 className="w-4 h-4" />
-                <span className="font-medium text-gray-900">{client.contactName}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Mail className="w-4 h-4" />
-                <a href={`mailto:${client.contactEmail}`} className="hover:text-purple-600 transition-colors">
-                  {client.contactEmail}
-                </a>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar className="w-4 h-4" />
-                Client since {format(new Date(client.createdAt), "MMMM d, yyyy")}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-500">Total Projects</span>
-            <FolderOpen className="text-gray-400 w-5 h-5" strokeWidth={1.5} />
-          </div>
-          <div className="text-3xl font-semibold text-gray-900 tracking-tight">{totalProjects}</div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-500">Active</span>
-            <Clock className="text-purple-500 w-5 h-5" strokeWidth={1.5} />
-          </div>
-          <div className="text-3xl font-semibold text-gray-900 tracking-tight">{activeProjects}</div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-500">Completed</span>
-            <CheckCircle className="text-green-500 w-5 h-5" strokeWidth={1.5} />
-          </div>
-          <div className="text-3xl font-semibold text-gray-900 tracking-tight">{completedProjects}</div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-500">Overdue</span>
-            <AlertCircle className="text-red-500 w-5 h-5" strokeWidth={1.5} />
-          </div>
-          <div className="text-3xl font-semibold text-gray-900 tracking-tight">{overdueProjects}</div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Projects List */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Projects</h2>
-            <AddProjectDialog clients={[{ id: client.id, companyName: client.companyName }]} />
-          </div>
-
-          {clientProjects.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center">
-              <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
-              <p className="text-gray-500 text-sm">No projects yet</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {clientProjects.map((project) => {
-                const projectStatus = getProjectStatusBadge(project.status);
-                const isOverdue = project.dueDate && new Date(project.dueDate) < now && project.status !== "completed";
-
-                return (
-                  <Link
-                    key={project.id}
-                    href={`/dashboard/admin/projects/${project.id}`}
-                    className="block bg-white rounded-lg border border-gray-200 shadow-sm p-5 hover:shadow-md transition-all duration-200 group"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 tracking-tight group-hover:text-purple-600 transition-colors">
-                          {project.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {project.description || "No description"}
-                        </p>
-                        {project.dueDate && (
-                          <p className={`text-xs mt-2 ${isOverdue ? "text-red-600 font-medium" : "text-gray-500"}`}>
-                            Due {formatDistanceToNow(new Date(project.dueDate), { addSuffix: true })}
-                          </p>
-                        )}
-                      </div>
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${projectStatus.bg} ${projectStatus.text} border ${projectStatus.border} whitespace-nowrap`}
-                      >
-                        {projectStatus.label}
-                      </span>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Activity Sidebar */}
-        <div className="space-y-6">
-          {/* Portal Users */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Portal Users</h2>
-              <InviteUserToClientDialog clientId={client.id} companyName={client.companyName} />
-            </div>
-
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              {portalUsers.length === 0 ? (
-                <div className="text-center py-8">
-                  <User className="w-12 h-12 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
-                  <p className="text-sm text-gray-500 mb-4">No portal users yet</p>
-                  <p className="text-xs text-gray-400">
-                    Invite users from {client.companyName} to give them access to projects and files.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                    <UsersIcon className="w-4 h-4" />
-                    <span className="font-medium">{portalUsers.length} user{portalUsers.length > 1 ? "s" : ""}</span>
-                  </div>
-                  {portalUsers.map((user) => (
-                    <div key={user.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-md">
-                      <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center">
-                        <User className="w-4 h-4 text-purple-600" strokeWidth={1.5} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">
-                          User ID: {user.clerkId.slice(0, 10)}...
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Joined {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Pending Invites */}
-          {pendingInvites.length > 0 && (
+        {/* Client Header */}
+        <div className="bg-white p-6 rounded-2xl mb-8 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] [animation:animationIn_0.5s_ease-out_0.1s_both] animate-on-scroll">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Pending Invites</h2>
-
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
-                    <MailCheck className="w-4 h-4" />
-                    <span className="font-medium">{pendingInvites.length} pending invite{pendingInvites.length > 1 ? "s" : ""}</span>
-                  </div>
-                  {pendingInvites.map((invite) => (
-                    <div key={invite.id} className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-100 rounded-md">
-                      <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center">
-                        <Clock className="w-4 h-4 text-yellow-600" strokeWidth={1.5} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">
-                          {invite.email}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Sent {formatDistanceToNow(new Date(invite.createdAt), { addSuffix: true })} • Expires {formatDistanceToNow(new Date(invite.expiresAt), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  <p className="text-xs text-gray-500 mt-2">
-                    These users have been invited but haven't signed up yet. Invites expire after 7 days.
-                  </p>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl md:text-4xl font-medium text-slate-900 tracking-tight">{client.companyName}</h1>
+                <span
+                  className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusBadge.bg} ${statusBadge.text} border ${statusBadge.border}`}
+                >
+                  {statusBadge.label}
+                </span>
+              </div>
+              <div className="space-y-2 mt-4">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <Building2 className="w-4 h-4" />
+                  <span className="font-medium text-slate-700">{client.contactName}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <Mail className="w-4 h-4" />
+                  <a href={`mailto:${client.contactEmail}`} className="hover:text-indigo-600 transition-colors">
+                    {client.contactEmail}
+                  </a>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <Calendar className="w-4 h-4" />
+                  Client since {format(new Date(client.createdAt), "MMMM d, yyyy")}
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* Activity */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Activity</h2>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] [animation:animationIn_0.5s_ease-out_0.2s_both] animate-on-scroll">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-widest">Total Projects</span>
+              <FolderOpen className="text-slate-400 w-5 h-5" strokeWidth={1.5} />
+            </div>
+            <div className="text-3xl font-medium text-slate-900 tracking-tight">{totalProjects}</div>
+          </div>
 
-            <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                    <Activity className="w-4 h-4" />
-                    <span className="font-medium">Last Login</span>
+          <div className="bg-white p-6 rounded-2xl border border-indigo-100 shadow-[0_4px_20px_-4px_rgba(99,102,241,0.05)] [animation:animationIn_0.5s_ease-out_0.3s_both] animate-on-scroll">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-widest">Active</span>
+              <Clock className="text-indigo-500 w-5 h-5" strokeWidth={1.5} />
+            </div>
+            <div className="text-3xl font-medium text-slate-900 tracking-tight">{activeProjects}</div>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-emerald-100 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.05)] [animation:animationIn_0.5s_ease-out_0.4s_both] animate-on-scroll">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-emerald-600 uppercase tracking-widest">Completed</span>
+              <CheckCircle className="text-emerald-500 w-5 h-5" strokeWidth={1.5} />
+            </div>
+            <div className="text-3xl font-medium text-slate-900 tracking-tight">{completedProjects}</div>
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-red-100 shadow-[0_4px_20px_-4px_rgba(239,68,68,0.05)] [animation:animationIn_0.5s_ease-out_0.5s_both] animate-on-scroll">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-red-600 uppercase tracking-widest">Overdue</span>
+              <AlertCircle className="text-red-500 w-5 h-5" strokeWidth={1.5} />
+            </div>
+            <div className="text-3xl font-medium text-slate-900 tracking-tight">{overdueProjects}</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Projects List */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center justify-between mb-4 [animation:animationIn_0.5s_ease-out_0.6s_both] animate-on-scroll">
+              <div className="flex items-center gap-3">
+                <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Projects</h2>
+              </div>
+              <AddProjectDialog clients={[{ id: client.id, companyName: client.companyName }]} />
+            </div>
+
+            {clientProjects.length === 0 ? (
+              <div className="bg-white rounded-2xl p-8 text-center border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] [animation:animationIn_0.5s_ease-out_0.7s_both] animate-on-scroll">
+                <FolderOpen className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
+                <p className="text-slate-500 text-sm">No projects yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {clientProjects.map((project, index) => {
+                  const projectStatus = getProjectStatusBadge(project.status);
+                  const isOverdue = project.dueDate && new Date(project.dueDate) < now && project.status !== "completed";
+
+                  return (
+                    <Link
+                      key={project.id}
+                      href={`/dashboard/admin/projects/${project.id}`}
+                      className="block bg-white rounded-2xl p-5 border border-slate-100 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-200 group animate-on-scroll"
+                      style={{ animation: `animationIn 0.5s ease-out ${0.7 + index * 0.1}s both` }}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-slate-900 tracking-tight group-hover:text-indigo-700 transition-colors">
+                            {project.name}
+                          </h3>
+                          <p className="text-sm text-slate-500 mt-1 line-clamp-2">
+                            {project.description || "No description"}
+                          </p>
+                          {project.dueDate && (
+                            <p className={`text-xs mt-2 ${isOverdue ? "text-red-600 font-medium" : "text-slate-400"}`}>
+                              Due {formatDistanceToNow(new Date(project.dueDate), { addSuffix: true })}
+                            </p>
+                          )}
+                        </div>
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${projectStatus.bg} ${projectStatus.text} border ${projectStatus.border} whitespace-nowrap`}
+                        >
+                          {projectStatus.label}
+                        </span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Activity Sidebar */}
+          <div className="space-y-6">
+            {/* Portal Users */}
+            <div className="[animation:animationIn_0.5s_ease-out_0.7s_both] animate-on-scroll">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                  <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Portal Users</h2>
+                </div>
+                <InviteUserToClientDialog clientId={client.id} companyName={client.companyName} />
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
+                {portalUsers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <User className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
+                    <p className="text-sm text-slate-500 mb-4">No portal users yet</p>
+                    <p className="text-xs text-slate-400">
+                      Invite users from {client.companyName} to give them access to projects and files.
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-900 ml-6">
-                    {activity?.lastLogin
-                      ? formatDistanceToNow(new Date(activity.lastLogin), { addSuffix: true })
-                      : "Never"}
-                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
+                      <UsersIcon className="w-4 h-4" />
+                      <span className="font-medium">{portalUsers.length} user{portalUsers.length > 1 ? "s" : ""}</span>
+                    </div>
+                    {portalUsers.map((user) => (
+                      <div key={user.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
+                          <User className="w-4 h-4 text-indigo-600" strokeWidth={1.5} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-700">
+                            User ID: {user.clerkId.slice(0, 10)}...
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            Joined {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Pending Invites */}
+            {pendingInvites.length > 0 && (
+              <div className="[animation:animationIn_0.5s_ease-out_0.8s_both] animate-on-scroll">
+                <div className="flex items-center gap-3 mb-4">
+                  <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                  <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Pending Invites</h2>
                 </div>
 
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                    <Mail className="w-4 h-4" />
-                    <span className="font-medium">Last Message</span>
+                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
+                      <MailCheck className="w-4 h-4" />
+                      <span className="font-medium">{pendingInvites.length} pending invite{pendingInvites.length > 1 ? "s" : ""}</span>
+                    </div>
+                    {pendingInvites.map((invite) => (
+                      <div key={invite.id} className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center border border-yellow-200">
+                          <Clock className="w-4 h-4 text-yellow-600" strokeWidth={1.5} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-700">
+                            {invite.email}
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            Sent {formatDistanceToNow(new Date(invite.createdAt), { addSuffix: true })} • Expires {formatDistanceToNow(new Date(invite.expiresAt), { addSuffix: true })}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-xs text-slate-400 mt-2">
+                      These users have been invited but haven't signed up yet. Invites expire after 7 days.
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-900 ml-6">
-                    {activity?.lastMessageSent
-                      ? formatDistanceToNow(new Date(activity.lastMessageSent), { addSuffix: true })
-                      : "No messages yet"}
-                  </p>
                 </div>
+              </div>
+            )}
 
-                <div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                    <FolderOpen className="w-4 h-4" />
-                    <span className="font-medium">Last File Download</span>
+            {/* Activity */}
+            <div className="[animation:animationIn_0.5s_ease-out_0.9s_both] animate-on-scroll">
+              <div className="flex items-center gap-3 mb-4">
+                <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Activity</h2>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                      <Activity className="w-4 h-4" />
+                      <span className="font-medium">Last Login</span>
+                    </div>
+                    <p className="text-sm text-slate-700 ml-6">
+                      {activity?.lastLogin
+                        ? formatDistanceToNow(new Date(activity.lastLogin), { addSuffix: true })
+                        : "Never"}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-900 ml-6">
-                    {activity?.lastFileDownloaded
-                      ? formatDistanceToNow(new Date(activity.lastFileDownloaded), { addSuffix: true })
-                      : "No downloads yet"}
-                  </p>
+
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                      <Mail className="w-4 h-4" />
+                      <span className="font-medium">Last Message</span>
+                    </div>
+                    <p className="text-sm text-slate-700 ml-6">
+                      {activity?.lastMessageSent
+                        ? formatDistanceToNow(new Date(activity.lastMessageSent), { addSuffix: true })
+                        : "No messages yet"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                      <FolderOpen className="w-4 h-4" />
+                      <span className="font-medium">Last File Download</span>
+                    </div>
+                    <p className="text-sm text-slate-700 ml-6">
+                      {activity?.lastFileDownloaded
+                        ? formatDistanceToNow(new Date(activity.lastFileDownloaded), { addSuffix: true })
+                        : "No downloads yet"}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -57,16 +57,16 @@ export function MessageList({ projectId, initialMessages }: MessageListProps) {
 
   if (messages.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-8 text-center">
-        <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
-        <p className="text-gray-500 text-sm">No messages yet</p>
+      <div className="bg-white rounded-lg p-8 text-center border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
+        <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
+        <p className="text-slate-400 text-sm">No messages yet</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm divide-y divide-gray-100">
+      <div className="bg-white rounded-lg divide-y divide-slate-100 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
         {messages.map((message) => (
           <div key={message.id} className="p-4">
             <div className="flex items-start gap-3">
@@ -79,23 +79,23 @@ export function MessageList({ projectId, initialMessages }: MessageListProps) {
                   className="rounded-full flex-shrink-0"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
-                  <User className="w-4 h-4 text-gray-600" />
+                <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 border border-slate-200">
+                  <User className="w-4 h-4 text-slate-400" />
                 </div>
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-medium text-gray-900">{message.senderName}</span>
+                  <span className="text-sm font-medium text-slate-900">{message.senderName}</span>
                   {message.senderRole === "admin" && (
-                    <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded-full">
+                    <span className="text-xs px-1.5 py-0.5 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-200">
                       Team
                     </span>
                   )}
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-slate-400">
                     {formatDistanceToNow(new Date(message.createdAt), { addSuffix: true })}
                   </span>
                 </div>
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{message.content}</p>
+                <p className="text-sm text-slate-600 whitespace-pre-wrap">{message.content}</p>
               </div>
             </div>
           </div>
@@ -107,7 +107,7 @@ export function MessageList({ projectId, initialMessages }: MessageListProps) {
           <button
             onClick={loadMore}
             disabled={loading}
-            className="text-sm text-purple-600 hover:text-purple-700 font-medium disabled:opacity-50 inline-flex items-center gap-2"
+            className="text-sm text-indigo-600 hover:text-indigo-700 font-medium disabled:opacity-50 inline-flex items-center gap-2 transition-colors"
           >
             {loading ? (
               <>

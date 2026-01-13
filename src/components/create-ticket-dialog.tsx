@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { GlowButton } from "@/components/glow-button";
 
 interface Project {
   id: string;
@@ -106,15 +107,15 @@ export function CreateTicketDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2 shadow-sm text-sm font-medium">
-          <Plus className="w-[18px] h-[18px]" strokeWidth={1.5} />
+        <GlowButton>
+          <Plus className="w-4 h-4" />
           <span>New Ticket</span>
-        </button>
+        </GlowButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] bg-white border border-slate-200">
         <DialogHeader>
-          <DialogTitle>Create Support Ticket</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-900">Create Support Ticket</DialogTitle>
+          <DialogDescription className="text-slate-500">
             Describe your issue or request and we&apos;ll get back to you as soon as possible.
           </DialogDescription>
         </DialogHeader>
@@ -228,14 +229,14 @@ export function CreateTicketDialog({
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-full transition-colors border border-slate-200"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-full transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? "Creating..." : "Create Ticket"}

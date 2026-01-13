@@ -19,8 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { GlowButton } from "@/components/glow-button";
 
 export function AddClientDialog() {
   const router = useRouter();
@@ -98,15 +99,15 @@ export function AddClientDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center gap-2 shadow-sm text-sm font-medium group">
-          <Plus className="w-[18px] h-[18px]" strokeWidth={1.5} />
+        <GlowButton>
+          <ArrowRight className="w-4 h-4" />
           <span>Add Client</span>
-        </button>
+        </GlowButton>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white border border-slate-200">
         <DialogHeader>
-          <DialogTitle>Add New Client</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-slate-900">Add New Client</DialogTitle>
+          <DialogDescription className="text-slate-500">
             Create a new client profile. They&apos;ll be able to view projects and files you assign to them.
           </DialogDescription>
         </DialogHeader>
@@ -168,9 +169,9 @@ export function AddClientDialog() {
               id="sendInvite"
               checked={formData.sendInvite}
               onChange={(e) => setFormData({ ...formData, sendInvite: e.target.checked })}
-              className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-600"
+              className="h-4 w-4 rounded border-white/10 bg-white/5 text-indigo-600 focus:ring-indigo-500"
             />
-            <label htmlFor="sendInvite" className="text-sm text-gray-700 cursor-pointer">
+            <label htmlFor="sendInvite" className="text-sm text-slate-400 cursor-pointer">
               Send portal invite email to contact
             </label>
           </div>
@@ -179,14 +180,14 @@ export function AddClientDialog() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-full transition-colors border border-slate-200"
               disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-full transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? "Creating..." : "Create Client"}
