@@ -16,7 +16,7 @@ import { AnimateOnScroll } from "@/components/animate-on-scroll";
 export const dynamic = "force-dynamic";
 
 export default async function AdminTicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireAdmin();
+  const currentUser = await requireAdmin();
   const { id } = await params;
 
   // Fetch ticket with related data
@@ -172,6 +172,8 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
               ticketId={ticket.id}
               currentStatus={ticket.status}
               isAssigned={!!ticket.assignedTo}
+              assignedToUserId={ticket.assignedTo}
+              currentUserId={currentUser.id}
             />
           </div>
         </div>

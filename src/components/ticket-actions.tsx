@@ -27,6 +27,8 @@ interface TicketActionsProps {
   ticketId: string;
   currentStatus: string;
   isAssigned: boolean;
+  assignedToUserId: string | null;
+  currentUserId: string;
 }
 
 export function ClaimTicketButton({ ticketId }: { ticketId: string }) {
@@ -283,9 +285,11 @@ export function ResolveTicketDialog({ ticketId }: { ticketId: string }) {
   );
 }
 
-export function TicketActions({ ticketId, currentStatus, isAssigned }: TicketActionsProps) {
+export function TicketActions({ ticketId, currentStatus, isAssigned, assignedToUserId, currentUserId }: TicketActionsProps) {
+  const isAssignedToCurrentUser = assignedToUserId === currentUserId;
+
   const showClaim = !isAssigned && currentStatus === "open";
-  const showUnclaim = isAssigned && currentStatus !== "resolved" && currentStatus !== "closed";
+  const showUnclaim = isAssignedToCurrentUser && currentStatus !== "resolved" && currentStatus !== "closed";
   const showResolve = currentStatus !== "resolved" && currentStatus !== "closed";
 
   return (
