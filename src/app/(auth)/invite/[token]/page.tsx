@@ -160,7 +160,7 @@ export default function InvitePage() {
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">Already Logged In</h1>
             <p className="text-slate-600 mb-6">
-              You're currently logged in to another account. This invite is for{" "}
+              You&apos;re currently logged in to another account. This invite is for{" "}
               <strong className="text-amber-600">{invite?.email}</strong>.
             </p>
             <p className="text-sm text-slate-500 mb-6">

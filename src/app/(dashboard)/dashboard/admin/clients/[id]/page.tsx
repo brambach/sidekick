@@ -1,14 +1,18 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { clients, projects, clientActivity, users, invites } from "@/lib/db/schema";
-import { eq, isNull, and, gt } from "drizzle-orm";
+import { clients, projects, clientActivity, users, invites, integrationMonitors } from "@/lib/db/schema";
+import { eq, isNull, and, gt, desc } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Mail, Building2, Calendar, Activity, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon, MailCheck, LayoutGrid } from "lucide-react";
+import { ArrowLeft, Mail, Building2, Calendar, Activity as ActivityIcon, FolderOpen, CheckCircle, AlertCircle, Clock, User, Users as UsersIcon, MailCheck, LayoutGrid, FileText } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { AddProjectDialog } from "@/components/add-project-dialog";
 import { InviteUserToClientDialog } from "@/components/invite-user-to-client-dialog";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
+import { SupportHoursCard } from "@/components/support-hours-card";
+import { IntegrationManagementSection } from "@/components/integration-management-section";
+import { EditClientDialog } from "@/components/edit-client-dialog";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +91,28 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     .where(and(eq(users.clientId, id), isNull(users.deletedAt)))
     .orderBy(users.createdAt);
 
+  // Fetch Clerk user data for portal users
+  const portalUsersWithDetails = await Promise.all(
+    portalUsers.map(async (user) => {
+      try {
+        const client = await clerkClient();
+        const clerkUser = await client.users.getUser(user.clerkId);
+        return {
+          ...user,
+          name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Unknown User",
+          email: clerkUser.emailAddresses[0]?.emailAddress || "No email",
+        };
+      } catch (error) {
+        console.error(`Error fetching Clerk user ${user.clerkId}:`, error);
+        return {
+          ...user,
+          name: "Unknown User",
+          email: "No email",
+        };
+      }
+    })
+  );
+
   // Fetch pending invites for this client
   const pendingInvites = await db
     .select({
@@ -104,6 +130,13 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       )
     )
     .orderBy(invites.createdAt);
+
+  // Fetch integrations for this client
+  const integrations = await db
+    .select()
+    .from(integrationMonitors)
+    .where(and(eq(integrationMonitors.clientId, id), isNull(integrationMonitors.deletedAt)))
+    .orderBy(desc(integrationMonitors.createdAt));
 
   // Calculate project stats
   const totalProjects = clientProjects.length;
@@ -161,6 +194,17 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 </div>
               </div>
             </div>
+            <div className="shrink-0">
+              <EditClientDialog
+                client={{
+                  id: client.id,
+                  companyName: client.companyName,
+                  contactName: client.contactName,
+                  contactEmail: client.contactEmail,
+                  status: client.status,
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -199,9 +243,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Projects List */}
-          <div className="lg:col-span-2 space-y-4">
+        {/* Projects Section */}
+        <div className="space-y-4">
             <div className="flex items-center justify-between mb-4 [animation:animationIn_0.5s_ease-out_0.6s_both] animate-on-scroll">
               <div className="flex items-center gap-3">
                 <LayoutGrid className="w-4 h-4 text-indigo-500" />
@@ -253,22 +296,22 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 })}
               </div>
             )}
-          </div>
+        </div>
 
-          {/* Activity Sidebar */}
-          <div className="space-y-6">
-            {/* Portal Users */}
-            <div className="[animation:animationIn_0.5s_ease-out_0.7s_both] animate-on-scroll">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <LayoutGrid className="w-4 h-4 text-indigo-500" />
-                  <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Portal Users</h2>
-                </div>
-                <InviteUserToClientDialog clientId={client.id} companyName={client.companyName} />
+        {/* Grid Layout for Other Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Portal Users */}
+          <div className="[animation:animationIn_0.5s_ease-out_0.7s_both] animate-on-scroll">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <LayoutGrid className="w-4 h-4 text-indigo-500" />
+                <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Portal Users</h2>
               </div>
+              <InviteUserToClientDialog clientId={client.id} companyName={client.companyName} />
+            </div>
 
               <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
-                {portalUsers.length === 0 ? (
+                {portalUsersWithDetails.length === 0 ? (
                   <div className="text-center py-8">
                     <User className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
                     <p className="text-sm text-slate-500 mb-4">No portal users yet</p>
@@ -280,18 +323,21 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
                       <UsersIcon className="w-4 h-4" />
-                      <span className="font-medium">{portalUsers.length} user{portalUsers.length > 1 ? "s" : ""}</span>
+                      <span className="font-medium">{portalUsersWithDetails.length} user{portalUsersWithDetails.length > 1 ? "s" : ""}</span>
                     </div>
-                    {portalUsers.map((user) => (
+                    {portalUsersWithDetails.map((user) => (
                       <div key={user.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center border border-indigo-200">
-                          <User className="w-4 h-4 text-indigo-600" strokeWidth={1.5} />
+                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center border border-purple-200">
+                          <User className="w-4 h-4 text-purple-600" strokeWidth={1.5} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-slate-700">
-                            User ID: {user.clerkId.slice(0, 10)}...
+                            {user.name}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-400 truncate">
+                            {user.email}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-0.5">
                             Joined {formatDistanceToNow(new Date(user.createdAt), { addSuffix: true })}
                           </p>
                         </div>
@@ -300,11 +346,73 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </div>
                 )}
               </div>
+          </div>
+
+          {/* Support Hours */}
+          <div className="[animation:animationIn_0.5s_ease-out_0.8s_both] animate-on-scroll">
+            <div className="flex items-center gap-3 mb-4">
+              <LayoutGrid className="w-4 h-4 text-indigo-500" />
+              <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Support Hours</h2>
+            </div>
+            <SupportHoursCard clientId={client.id} isAdmin={true} />
+          </div>
+
+          {/* Integrations */}
+          <div className="[animation:animationIn_0.5s_ease-out_0.85s_both] animate-on-scroll">
+            <IntegrationManagementSection clientId={client.id} integrations={integrations} />
+          </div>
+
+          {/* Activity */}
+          <div className="[animation:animationIn_0.5s_ease-out_1.0s_both] animate-on-scroll">
+            <div className="flex items-center gap-3 mb-4">
+              <LayoutGrid className="w-4 h-4 text-indigo-500" />
+              <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Activity</h2>
             </div>
 
-            {/* Pending Invites */}
-            {pendingInvites.length > 0 && (
-              <div className="[animation:animationIn_0.5s_ease-out_0.8s_both] animate-on-scroll">
+            <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                    <ActivityIcon className="w-4 h-4" />
+                    <span className="font-medium">Last Login</span>
+                  </div>
+                  <p className="text-sm text-slate-700 ml-6">
+                    {activity?.lastLogin
+                      ? formatDistanceToNow(new Date(activity.lastLogin), { addSuffix: true })
+                      : "Never"}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                    <Mail className="w-4 h-4" />
+                    <span className="font-medium">Last Message</span>
+                  </div>
+                  <p className="text-sm text-slate-700 ml-6">
+                    {activity?.lastMessageSent
+                      ? formatDistanceToNow(new Date(activity.lastMessageSent), { addSuffix: true })
+                      : "No messages yet"}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                    <FileText className="w-4 h-4" />
+                    <span className="font-medium">Last File Download</span>
+                  </div>
+                  <p className="text-sm text-slate-700 ml-6">
+                    {activity?.lastFileDownloaded
+                      ? formatDistanceToNow(new Date(activity.lastFileDownloaded), { addSuffix: true })
+                      : "No downloads yet"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Invites */}
+          {pendingInvites.length > 0 && (
+            <div className="[animation:animationIn_0.5s_ease-out_0.9s_both] animate-on-scroll lg:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
                   <LayoutGrid className="w-4 h-4 text-indigo-500" />
                   <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Pending Invites</h2>
@@ -338,55 +446,6 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 </div>
               </div>
             )}
-
-            {/* Activity */}
-            <div className="[animation:animationIn_0.5s_ease-out_0.9s_both] animate-on-scroll">
-              <div className="flex items-center gap-3 mb-4">
-                <LayoutGrid className="w-4 h-4 text-indigo-500" />
-                <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Activity</h2>
-              </div>
-
-              <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                      <Activity className="w-4 h-4" />
-                      <span className="font-medium">Last Login</span>
-                    </div>
-                    <p className="text-sm text-slate-700 ml-6">
-                      {activity?.lastLogin
-                        ? formatDistanceToNow(new Date(activity.lastLogin), { addSuffix: true })
-                        : "Never"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                      <Mail className="w-4 h-4" />
-                      <span className="font-medium">Last Message</span>
-                    </div>
-                    <p className="text-sm text-slate-700 ml-6">
-                      {activity?.lastMessageSent
-                        ? formatDistanceToNow(new Date(activity.lastMessageSent), { addSuffix: true })
-                        : "No messages yet"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                      <FolderOpen className="w-4 h-4" />
-                      <span className="font-medium">Last File Download</span>
-                    </div>
-                    <p className="text-sm text-slate-700 ml-6">
-                      {activity?.lastFileDownloaded
-                        ? formatDistanceToNow(new Date(activity.lastFileDownloaded), { addSuffix: true })
-                        : "No downloads yet"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </>

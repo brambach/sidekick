@@ -10,6 +10,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { TicketStatusBadge, TicketPriorityBadge, TicketTypeBadge } from "@/components/ticket-status-badge";
 import { TicketActions } from "@/components/ticket-actions";
 import { TicketCommentForm } from "@/components/ticket-comment-form";
+import { TimeEntriesList } from "@/components/time-entries-list";
 import Image from "next/image";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
 
@@ -242,6 +243,15 @@ export default async function AdminTicketDetailPage({ params }: { params: Promis
                 })}
               </div>
             )}
+
+            {/* Time Tracking */}
+            <div className="[animation:animationIn_0.5s_ease-out_0.5s_both] animate-on-scroll">
+              <div className="flex items-center gap-3 mb-4">
+                <LayoutGrid className="w-4 h-4 text-purple-500" />
+                <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Time Logged</h2>
+              </div>
+              <TimeEntriesList ticketId={id} />
+            </div>
           </div>
 
           {/* Sidebar */}

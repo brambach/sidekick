@@ -126,8 +126,8 @@
 /* Glow Button Effect */
 :root {
   --glow-core: rgba(255, 255, 255, 0.8);
-  --glow-color: rgba(99, 102, 241, 0.35);
-  --glow-color-strong: rgba(99, 102, 241, 0.55);
+  --glow-color: rgba(139, 92, 246, 0.35);
+  --glow-color-strong: rgba(139, 92, 246, 0.55);
 }
 
 .glow-btn {

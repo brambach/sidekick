@@ -87,7 +87,10 @@ export async function POST(req: NextRequest) {
         });
       } catch (insertError: any) {
         // Handle duplicate key error from webhook race condition
-        if (insertError?.code === "23505") {
+        // Check both insertError.code and insertError.cause.code (Drizzle wraps Postgres errors)
+        const errorCode = insertError?.code || insertError?.cause?.code;
+
+        if (errorCode === "23505") {
           console.log("User already exists (created by webhook), updating instead...");
           // Fetch the user that was just created
           const [webhookUser] = await db

@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { UserPlus, CheckCircle, Clock, UserMinus } from "lucide-react";
+import { LogTimeDialog } from "@/components/log-time-dialog";
 
 interface TicketActionsProps {
   ticketId: string;
@@ -285,6 +286,33 @@ export function ResolveTicketDialog({ ticketId }: { ticketId: string }) {
   );
 }
 
+export function LogTimeButton({ ticketId }: { ticketId: string }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  const handleSuccess = () => {
+    router.refresh();
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg transition-all"
+      >
+        <Clock className="w-4 h-4" />
+        Log Time
+      </button>
+      <LogTimeDialog
+        ticketId={ticketId}
+        open={open}
+        onOpenChange={setOpen}
+        onSuccess={handleSuccess}
+      />
+    </>
+  );
+}
+
 export function TicketActions({ ticketId, currentStatus, isAssigned, assignedToUserId, currentUserId }: TicketActionsProps) {
   const isAssignedToCurrentUser = assignedToUserId === currentUserId;
 
@@ -293,9 +321,10 @@ export function TicketActions({ ticketId, currentStatus, isAssigned, assignedToU
   const showResolve = currentStatus !== "resolved" && currentStatus !== "closed";
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 flex-wrap">
       {showClaim && <ClaimTicketButton ticketId={ticketId} />}
       {showUnclaim && <UnclaimTicketButton ticketId={ticketId} />}
+      <LogTimeButton ticketId={ticketId} />
       <UpdateStatusButton ticketId={ticketId} currentStatus={currentStatus} />
       {showResolve && <ResolveTicketDialog ticketId={ticketId} />}
     </div>

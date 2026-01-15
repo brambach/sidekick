@@ -3,9 +3,11 @@ import { db } from "@/lib/db";
 import { projects, files, messages, clients } from "@/lib/db/schema";
 import { eq, isNull, and, desc, sql } from "drizzle-orm";
 import Link from "next/link";
-import { FolderOpen, FileText, MessageSquare, Clock, AlertCircle, CheckCircle, LayoutGrid, TrendingUp } from "lucide-react";
+import { FolderOpen, FileText, MessageSquare, Clock, AlertCircle, CheckCircle, LayoutGrid, TrendingUp, Activity } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
+import { SupportHoursCard } from "@/components/support-hours-card";
+import { IntegrationHealthGrid } from "@/components/integration-health-grid";
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +89,7 @@ export default async function ClientDashboard() {
         fileCount,
         messageCount,
         unreadCount,
-      };
+      } as typeof project & { fileCount: number; messageCount: number; unreadCount: number };
     })
   );
 
@@ -170,8 +172,28 @@ export default async function ClientDashboard() {
           </div>
         </div>
 
+        {/* Support Hours Section */}
+        <div className="mb-12 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.6s_both]">
+          <div className="flex items-center gap-3 mb-6 opacity-80">
+            <LayoutGrid className="w-4 h-4 text-purple-500" />
+            <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Support Hours</h2>
+            <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+          </div>
+          <SupportHoursCard clientId={client.id} isAdmin={false} />
+        </div>
+
+        {/* Integration Health Section */}
+        <div className="mb-12 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.65s_both]">
+          <div className="flex items-center gap-3 mb-6 opacity-80">
+            <Activity className="w-4 h-4 text-emerald-500" />
+            <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Integration Health</h2>
+            <div className="h-px bg-slate-200 flex-1 ml-2"></div>
+          </div>
+          <IntegrationHealthGrid clientId={client.id} />
+        </div>
+
         {/* Section Title */}
-        <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.6s_both]">
+        <div className="flex items-center gap-3 mb-6 opacity-80 animate-on-scroll [animation:animationIn_0.5s_ease-out_0.7s_both]">
           <LayoutGrid className="w-4 h-4 text-indigo-500" />
           <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Your Projects</h2>
           <div className="h-px bg-slate-200 flex-1 ml-2"></div>
@@ -196,7 +218,7 @@ export default async function ClientDashboard() {
                     key={project.id}
                     href={`/dashboard/client/projects/${project.id}`}
                     className="bg-white rounded-2xl p-6 border border-slate-100 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300 group relative overflow-hidden animate-on-scroll"
-                    style={{ animation: `animationIn 0.5s ease-out ${0.7 + index * 0.05}s both` }}
+                    style={{ animation: `animationIn 0.5s ease-out ${0.8 + index * 0.05}s both` }}
                   >
                     <div className="flex flex-col h-full relative z-10">
                       {/* Project Header */}

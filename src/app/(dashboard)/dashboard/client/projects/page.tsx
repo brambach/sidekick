@@ -87,7 +87,7 @@ export default async function ClientProjectsPage() {
         fileCount,
         messageCount,
         unreadCount,
-      };
+      } as typeof project & { fileCount: number; messageCount: number; unreadCount: number };
     })
   );
 

@@ -33,6 +33,7 @@ export default async function DashboardLayout({
         { label: "Clients", href: "/dashboard/admin/clients" },
         { label: "Projects", href: "/dashboard/admin/projects" },
         { label: "Tickets", href: "/dashboard/admin/tickets" },
+        { label: "Settings", href: "/dashboard/admin/settings" },
       ]
     : [
         { label: "Overview", href: "/dashboard/client" },

@@ -52,6 +52,29 @@ export const inviteStatusEnum = pgEnum("invite_status", [
   "expired",
 ]);
 
+// Integration enums
+export const integrationServiceTypeEnum = pgEnum("integration_service_type", [
+  "hibob",
+  "workato",
+  "keypay",
+  "adp",
+]);
+
+export const integrationStatusEnum = pgEnum("integration_status", [
+  "healthy",
+  "degraded",
+  "down",
+  "unknown",
+]);
+
+// Phase enums
+export const phaseStatusEnum = pgEnum("phase_status", [
+  "pending",
+  "in_progress",
+  "completed",
+  "skipped",
+]);
+
 // Users Table (Simplified - Clerk is source of truth for profile data)
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -86,6 +109,12 @@ export const clients = pgTable("clients", {
   contactName: varchar("contact_name", { length: 255 }).notNull(),
   contactEmail: varchar("contact_email", { length: 255 }).notNull(),
   status: clientStatusEnum("status").notNull().default("active"),
+
+  // Support hours tracking
+  supportHoursPerMonth: integer("support_hours_per_month").default(0),
+  hoursUsedThisMonth: integer("hours_used_this_month").default(0), // Stored in minutes
+  supportBillingCycleStart: timestamp("support_billing_cycle_start"),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   deletedAt: timestamp("deleted_at"),
@@ -104,6 +133,13 @@ export const projects = pgTable(
     status: projectStatusEnum("status").notNull().default("planning"),
     startDate: timestamp("start_date"),
     dueDate: timestamp("due_date"),
+
+    // Project phases
+    currentPhaseId: uuid("current_phase_id"),
+    phaseTemplateId: uuid("phase_template_id").references(() => phaseTemplates.id, {
+      onDelete: "set null",
+    }),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
     deletedAt: timestamp("deleted_at"),
@@ -208,6 +244,10 @@ export const tickets = pgTable(
     }),
     resolution: text("resolution"), // Summary of how it was resolved
 
+    // Time tracking
+    estimatedMinutes: integer("estimated_minutes"),
+    timeSpentMinutes: integer("time_spent_minutes").default(0),
+
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -277,6 +317,154 @@ export const invites = pgTable(
   })
 );
 
+// Support Hour Logs Table (Historical tracking)
+export const supportHourLogs = pgTable(
+  "support_hour_logs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    clientId: uuid("client_id")
+      .references(() => clients.id, { onDelete: "cascade" })
+      .notNull(),
+    periodStart: timestamp("period_start").notNull(),
+    periodEnd: timestamp("period_end").notNull(),
+    allocatedMinutes: integer("allocated_minutes").notNull(),
+    usedMinutes: integer("used_minutes").notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    clientIdx: index("support_hour_logs_client_idx").on(table.clientId),
+  })
+);
+
+// Ticket Time Entries Table (Detailed time logging)
+export const ticketTimeEntries = pgTable(
+  "ticket_time_entries",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ticketId: uuid("ticket_id")
+      .references(() => tickets.id, { onDelete: "cascade" })
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id, { onDelete: "set null" })
+      .notNull(),
+    minutes: integer("minutes").notNull(),
+    description: text("description"),
+    loggedAt: timestamp("logged_at").defaultNow().notNull(),
+    countTowardsSupportHours: boolean("count_towards_support_hours")
+      .default(true)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (table) => ({
+    ticketIdx: index("ticket_time_entries_ticket_idx").on(table.ticketId),
+    userIdx: index("ticket_time_entries_user_idx").on(table.userId),
+  })
+);
+
+// Integration Monitors Table (Per-client integrations)
+export const integrationMonitors = pgTable(
+  "integration_monitors",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    clientId: uuid("client_id")
+      .references(() => clients.id, { onDelete: "cascade" })
+      .notNull(),
+    serviceType: integrationServiceTypeEnum("service_type").notNull(),
+    serviceName: varchar("service_name", { length: 255 }).notNull(),
+    apiEndpoint: text("api_endpoint"),
+    credentials: text("credentials"), // Encrypted JSON
+    workatoRecipeIds: text("workato_recipe_ids"), // JSON array of recipe IDs
+    isEnabled: boolean("is_enabled").default(true).notNull(),
+    checkIntervalMinutes: integer("check_interval_minutes").default(5).notNull(),
+    lastCheckedAt: timestamp("last_checked_at"),
+    currentStatus: integrationStatusEnum("current_status").default("unknown"),
+    lastErrorMessage: text("last_error_message"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    deletedAt: timestamp("deleted_at"),
+  },
+  (table) => ({
+    clientIdx: index("integration_monitors_client_idx").on(table.clientId),
+    statusIdx: index("integration_monitors_status_idx").on(table.currentStatus),
+  })
+);
+
+// Integration Metrics Table (Health check history)
+export const integrationMetrics = pgTable(
+  "integration_metrics",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    monitorId: uuid("monitor_id")
+      .references(() => integrationMonitors.id, { onDelete: "cascade" })
+      .notNull(),
+    status: integrationStatusEnum("status").notNull(),
+    responseTimeMs: integer("response_time_ms"),
+    errorMessage: text("error_message"),
+    recipeStatuses: text("recipe_statuses"), // JSON object for Workato recipe statuses
+    checkedAt: timestamp("checked_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    monitorIdx: index("integration_metrics_monitor_idx").on(table.monitorId),
+    checkedAtIdx: index("integration_metrics_checked_at_idx").on(table.checkedAt),
+  })
+);
+
+// Phase Templates Table (Reusable phase definitions)
+export const phaseTemplates = pgTable("phase_templates", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  isDefault: boolean("is_default").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  deletedAt: timestamp("deleted_at"),
+});
+
+// Template Phases Table (Phases within a template)
+export const templatePhases = pgTable(
+  "template_phases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    templateId: uuid("template_id")
+      .references(() => phaseTemplates.id, { onDelete: "cascade" })
+      .notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    orderIndex: integer("order_index").notNull(),
+    estimatedDays: integer("estimated_days"),
+    color: varchar("color", { length: 7 }),
+  },
+  (table) => ({
+    templateIdx: index("template_phases_template_idx").on(table.templateId),
+    orderIdx: index("template_phases_order_idx").on(table.orderIndex),
+  })
+);
+
+// Project Phases Table (Actual phases on a project)
+export const projectPhases = pgTable(
+  "project_phases",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projectId: uuid("project_id")
+      .references(() => projects.id, { onDelete: "cascade" })
+      .notNull(),
+    name: varchar("name", { length: 255 }).notNull(),
+    description: text("description"),
+    orderIndex: integer("order_index").notNull(),
+    status: phaseStatusEnum("status").default("pending").notNull(),
+    startedAt: timestamp("started_at"),
+    completedAt: timestamp("completed_at"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    projectIdx: index("project_phases_project_idx").on(table.projectId),
+    orderIdx: index("project_phases_order_idx").on(table.orderIndex),
+  })
+);
+
 // Relations
 export const usersRelations = relations(users, ({ one }) => ({
   agency: one(agencies, {
@@ -311,6 +499,16 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   }),
   files: many(files),
   messages: many(messages),
+  phases: many(projectPhases),
+  currentPhase: one(projectPhases, {
+    fields: [projects.currentPhaseId],
+    references: [projectPhases.id],
+    relationName: "currentPhase",
+  }),
+  phaseTemplate: one(phaseTemplates, {
+    fields: [projects.phaseTemplateId],
+    references: [phaseTemplates.id],
+  }),
 }));
 
 export const filesRelations = relations(files, ({ one }) => ({
@@ -368,6 +566,7 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
     relationName: "ticketResolver",
   }),
   comments: many(ticketComments),
+  timeEntries: many(ticketTimeEntries),
 }));
 
 export const ticketCommentsRelations = relations(ticketComments, ({ one }) => ({
@@ -390,5 +589,64 @@ export const invitesRelations = relations(invites, ({ one }) => ({
   inviter: one(users, {
     fields: [invites.invitedBy],
     references: [users.id],
+  }),
+}));
+
+// Support Hour Logs Relations
+export const supportHourLogsRelations = relations(supportHourLogs, ({ one }) => ({
+  client: one(clients, {
+    fields: [supportHourLogs.clientId],
+    references: [clients.id],
+  }),
+}));
+
+// Ticket Time Entries Relations
+export const ticketTimeEntriesRelations = relations(ticketTimeEntries, ({ one }) => ({
+  ticket: one(tickets, {
+    fields: [ticketTimeEntries.ticketId],
+    references: [tickets.id],
+  }),
+  user: one(users, {
+    fields: [ticketTimeEntries.userId],
+    references: [users.id],
+  }),
+}));
+
+// Integration Monitors Relations
+export const integrationMonitorsRelations = relations(integrationMonitors, ({ one, many }) => ({
+  client: one(clients, {
+    fields: [integrationMonitors.clientId],
+    references: [clients.id],
+  }),
+  metrics: many(integrationMetrics),
+}));
+
+// Integration Metrics Relations
+export const integrationMetricsRelations = relations(integrationMetrics, ({ one }) => ({
+  monitor: one(integrationMonitors, {
+    fields: [integrationMetrics.monitorId],
+    references: [integrationMonitors.id],
+  }),
+}));
+
+// Phase Templates Relations
+export const phaseTemplatesRelations = relations(phaseTemplates, ({ many }) => ({
+  templatePhases: many(templatePhases),
+  projects: many(projects),
+}));
+
+// Template Phases Relations
+export const templatePhasesRelations = relations(templatePhases, ({ one }) => ({
+  template: one(phaseTemplates, {
+    fields: [templatePhases.templateId],
+    references: [phaseTemplates.id],
+  }),
+}));
+
+// Project Phases Relations
+export const projectPhasesRelations = relations(projectPhases, ({ one }) => ({
+  project: one(projects, {
+    fields: [projectPhases.projectId],
+    references: [projects.id],
   }),
 }));

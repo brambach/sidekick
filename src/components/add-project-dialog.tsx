@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -23,6 +24,7 @@ import {
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { GlowButton } from "@/components/glow-button";
+import { SelectPhaseTemplateDialog } from "@/components/select-phase-template-dialog";
 
 interface Client {
   id: string;
@@ -33,6 +35,8 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [createdProjectId, setCreatedProjectId] = useState<string | null>(null);
+  const [phaseTemplateDialogOpen, setPhaseTemplateDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -57,6 +61,8 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
         throw new Error("Failed to create project");
       }
 
+      const data = await response.json();
+
       // Reset form and close dialog
       setFormData({
         name: "",
@@ -67,8 +73,11 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
         dueDate: "",
       });
       setOpen(false);
-      router.refresh();
       toast.success("Project created successfully");
+
+      // Open phase template selector
+      setCreatedProjectId(data.id);
+      setPhaseTemplateDialogOpen(true);
     } catch (error) {
       console.error("Error creating project:", error);
       toast.error("Failed to create project. Please try again.");
@@ -78,6 +87,7 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
   };
 
   return (
+    <>
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <GlowButton>
@@ -179,24 +189,40 @@ export function AddProjectDialog({ clients }: { clients: Client[] }) {
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => setOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-full transition-colors border border-slate-200"
               disabled={loading}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-full transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               {loading ? "Creating..." : "Create Project"}
-            </button>
+            </Button>
           </div>
         </form>
       </DialogContent>
     </Dialog>
+
+      {/* Phase Template Selection Dialog */}
+      {createdProjectId && (
+        <SelectPhaseTemplateDialog
+          projectId={createdProjectId}
+          open={phaseTemplateDialogOpen}
+          onOpenChange={(open) => {
+            setPhaseTemplateDialogOpen(open);
+            if (!open) {
+              // Refresh after closing phase template dialog
+              router.refresh();
+              setCreatedProjectId(null);
+            }
+          }}
+        />
+      )}
+    </>
   );
 }

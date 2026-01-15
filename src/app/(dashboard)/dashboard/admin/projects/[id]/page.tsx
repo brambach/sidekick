@@ -9,6 +9,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import dynamicImport from "next/dynamic";
 import { clerkClient } from "@clerk/nextjs/server";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
+import { ProjectPhaseManager } from "@/components/project-phase-manager";
 
 // Lazy load heavy components for better performance
 const MessageForm = dynamicImport(() => import("@/components/message-form").then(mod => ({ default: mod.MessageForm })), {
@@ -228,6 +229,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               <UpdateStatusDialog projectId={project.id} currentStatus={project.status} />
             </div>
           </div>
+        </div>
+
+        {/* Project Phases */}
+        <div className="mb-6 [animation:animationIn_0.5s_ease-out_0.15s_both] animate-on-scroll">
+          <ProjectPhaseManager projectId={id} isAdmin={true} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

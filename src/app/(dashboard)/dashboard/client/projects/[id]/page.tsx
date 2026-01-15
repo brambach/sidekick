@@ -11,6 +11,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { MessageList } from "@/components/message-list";
 import { ContactTeamButton } from "@/components/contact-team-button";
 import { AnimateOnScroll } from "@/components/animate-on-scroll";
+import { ProjectPhaseManager } from "@/components/project-phase-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -183,6 +184,11 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
           </div>
         </div>
 
+        {/* Project Phases */}
+        <div className="mb-6 [animation:animationIn_0.5s_ease-out_0.15s_both] animate-on-scroll">
+          <ProjectPhaseManager projectId={id} isAdmin={false} />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
@@ -294,12 +300,34 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-4 border border-indigo-200 bg-indigo-50 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] [animation:animationIn_0.5s_ease-out_0.4s_both] animate-on-scroll">
-              <p className="text-sm text-indigo-700 font-medium mb-2">Need Help?</p>
-              <p className="text-xs text-indigo-600 mb-3">
-                Have questions about this project? Send us a message above and we&apos;ll get back to you shortly.
-              </p>
-              <ContactTeamButton />
+            <div className="bg-white rounded-2xl p-5 border border-indigo-200 bg-indigo-50 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] [animation:animationIn_0.5s_ease-out_0.4s_both] animate-on-scroll">
+              <p className="text-sm text-indigo-700 font-semibold mb-3">Need Help?</p>
+
+              <div className="space-y-3 mb-4">
+                <div className="bg-white/60 rounded-lg p-3 border border-indigo-100">
+                  <p className="text-xs font-semibold text-indigo-900 mb-1">Quick Questions</p>
+                  <p className="text-xs text-indigo-700 leading-relaxed">
+                    Send us a message above for quick questions or updates. Messages are free and don&apos;t count toward your support hours.
+                  </p>
+                </div>
+
+                <div className="bg-white/60 rounded-lg p-3 border border-indigo-100">
+                  <p className="text-xs font-semibold text-indigo-900 mb-1">Project Support</p>
+                  <p className="text-xs text-indigo-700 leading-relaxed">
+                    Need hands-on project work? Create a ticket for support that counts toward your monthly support hours package.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <ContactTeamButton />
+                <Link
+                  href="/dashboard/client/tickets"
+                  className="w-full px-4 py-2 text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-200 text-center"
+                >
+                  Create Support Ticket
+                </Link>
+              </div>
             </div>
           </div>
         </div>

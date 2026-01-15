@@ -118,6 +118,7 @@ All API routes require authentication. Most require specific roles.
 
 **Client Management:**
 - `POST /api/clients` - Create client (admin only, auto-associates with DD agency)
+- `PUT /api/clients/[id]` - Update client details (companyName, contactName, contactEmail, status)
 - `PATCH /api/clients/[id]/status` - Update status: active/inactive/archived
 - `DELETE /api/clients/[id]` - Permanent delete with cascade
 
@@ -222,6 +223,116 @@ Theme colors defined in `src/app/globals.css` using HSL values. Primary and acce
 
 **Shadcn UI:**
 Components in `src/components/ui/` use CSS variables for theming. Don't hardcode colors in Shadcn components.
+
+## UI Component Patterns
+
+### Button Standardization
+
+**All buttons use the Shadcn Button component** (`src/components/ui/button.tsx`):
+- **Never use raw `<button>` elements** - always use `<Button>` component
+- **Primary actions**: Default variant (purple background, white text, rounded-full)
+- **Secondary/Cancel**: Outline variant (white background, purple border)
+- **Destructive actions**: Destructive variant (red background)
+- **Consistent styling**: All buttons use `rounded-full`, `font-semibold`, purple accent colors
+
+```typescript
+// Primary action button
+<Button type="submit" disabled={loading}>
+  {loading ? "Creating..." : "Create Client"}
+</Button>
+
+// Cancel/secondary button
+<Button type="button" variant="outline" onClick={() => setOpen(false)}>
+  Cancel
+</Button>
+
+// Destructive button
+<Button variant="destructive" onClick={handleDelete}>
+  Delete
+</Button>
+
+// Icon button
+<Button variant="outline" size="sm">
+  <Pencil className="w-4 h-4 mr-2" />
+  Edit
+</Button>
+```
+
+**Dialog pattern**: All dialogs use consistent button layout with Cancel (outline) on left, Primary action on right.
+
+**Updated components**: All dialog components follow this pattern (add-client-dialog, create-ticket-dialog, edit-project-dialog, etc.)
+
+### Layout Patterns
+
+**Client Detail Page** (`/admin/clients/[id]`):
+- Projects section: Full width at top
+- Sidebar cards (Portal Users, Support Hours, Integrations, Activity): 2-column grid below projects
+- Pending Invites: Full width if present
+- Pattern maximizes horizontal space usage and reduces vertical scrolling
+
+**Responsive grid**:
+```typescript
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  {/* Cards span 1 column each */}
+  {/* Last card can span 2 columns if needed with lg:col-span-2 */}
+</div>
+```
+
+### Portal User Display
+
+When showing portal users for a client, **always fetch and display user names from Clerk**:
+
+```typescript
+// Fetch DB users
+const portalUsers = await db
+  .select({ id: users.id, clerkId: users.clerkId })
+  .from(users)
+  .where(eq(users.clientId, clientId));
+
+// Enrich with Clerk data
+const portalUsersWithDetails = await Promise.all(
+  portalUsers.map(async (user) => {
+    try {
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(user.clerkId);
+      return {
+        ...user,
+        name: `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Unknown User",
+        email: clerkUser.emailAddresses[0]?.emailAddress || "No email",
+      };
+    } catch (error) {
+      return { ...user, name: "Unknown User", email: "No email" };
+    }
+  })
+);
+```
+
+**Don't show**: User IDs like "User ID: user_38EPM..."
+**Do show**: "John Smith" with email
+
+### File Upload Component
+
+Custom file uploader (`src/components/file-uploader.tsx`) uses:
+- Hidden file input
+- Button component with `asChild` pattern wrapped in label
+- `useUploadThing` hook for upload functionality
+- Consistent purple button styling
+
+```typescript
+<label>
+  <input type="file" multiple className="hidden" onChange={handleFileChange} />
+  <Button type="button" disabled={isUploading} asChild>
+    <span className="cursor-pointer">
+      <Upload className="w-4 h-4" />
+      {isUploading ? "Uploading..." : "Upload Files"}
+    </span>
+  </Button>
+</label>
+```
+
+### Tooltip Z-Index
+
+Tooltips use `z-[9999]` to ensure they appear above all content including file panels and sticky headers.
 
 ## Common Pitfalls
 

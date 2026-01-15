@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create new project
-    const newProject = await db
+    const result = await db
       .insert(projects)
       .values({
         name,
@@ -48,7 +48,9 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    return NextResponse.json(newProject[0], { status: 201 });
+    const newProject = (result as any)[0];
+
+    return NextResponse.json(newProject, { status: 201 });
   } catch (error) {
     console.error("Error creating project:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
