@@ -1,11 +1,10 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, files, messages, clients } from "@/lib/db/schema";
+import { projects, messages, clients } from "@/lib/db/schema";
 import { eq, isNull, and, desc, sql } from "drizzle-orm";
 import Link from "next/link";
 import {
   FolderOpen,
-  FileText,
   MessageSquare,
   Clock,
   AlertCircle,
@@ -81,15 +80,10 @@ export default async function ClientDashboard() {
     .where(and(eq(projects.clientId, client.id), isNull(projects.deletedAt)))
     .orderBy(desc(projects.createdAt));
 
-  // Get file and message counts for each project
+  // Get message counts for each project
   const projectData = await Promise.all(
     clientProjects.map(async (project) => {
-      const [fileCount, messageCount, unreadCount] = await Promise.all([
-        db
-          .select({ count: sql<number>`count(*)::int` })
-          .from(files)
-          .where(eq(files.projectId, project.id))
-          .then((rows) => rows[0]?.count || 0),
+      const [messageCount, unreadCount] = await Promise.all([
         db
           .select({ count: sql<number>`count(*)::int` })
           .from(messages)
@@ -112,7 +106,6 @@ export default async function ClientDashboard() {
 
       return {
         ...project,
-        fileCount,
         messageCount,
         unreadCount,
       };
@@ -130,7 +123,6 @@ export default async function ClientDashboard() {
   const completedProjects = projectData.filter(
     (p) => p.status === "completed"
   ).length;
-  const totalFiles = projectData.reduce((sum, p) => sum + p.fileCount, 0);
 
   const now = new Date();
 
@@ -152,7 +144,7 @@ export default async function ClientDashboard() {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
           <div className="stat-card animate-fade-in-up opacity-0 stagger-2">
             <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
               <FolderOpen className="w-5 h-5 text-slate-600" />
@@ -183,14 +175,6 @@ export default async function ClientDashboard() {
               </div>
               <div className="stat-label">Completed</div>
             </div>
-          </div>
-
-          <div className="stat-card animate-fade-in-up opacity-0 stagger-3">
-            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
-              <FileText className="w-5 h-5 text-slate-600" />
-            </div>
-            <div className="stat-value">{totalFiles}</div>
-            <div className="stat-label">Files</div>
           </div>
         </div>
 
@@ -293,13 +277,6 @@ export default async function ClientDashboard() {
                     )}
 
                     <div className="flex items-center gap-4 pt-4 border-t border-slate-100">
-                      <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                        <FileText className="w-3.5 h-3.5" />
-                        <span>
-                          {project.fileCount}{" "}
-                          {project.fileCount === 1 ? "file" : "files"}
-                        </span>
-                      </div>
                       <div className="flex items-center gap-1.5 text-xs text-slate-500">
                         <MessageSquare className="w-3.5 h-3.5" />
                         <span>

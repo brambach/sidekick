@@ -1,10 +1,10 @@
 import { requireAdmin } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, clients, files, messages, users, integrationMonitors } from "@/lib/db/schema";
+import { projects, clients, messages, users, integrationMonitors } from "@/lib/db/schema";
 import { eq, isNull, and, desc } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Calendar, User, Building2, FileText, MessageSquare, Clock, Download, LayoutGrid } from "lucide-react";
+import { ArrowLeft, Calendar, User, Building2, MessageSquare, Clock, LayoutGrid } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import dynamicImport from "next/dynamic";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -15,9 +15,6 @@ import { IntegrationManagementSection } from "@/components/integration-managemen
 // Lazy load heavy components for better performance
 const MessageForm = dynamicImport(() => import("@/components/message-form").then(mod => ({ default: mod.MessageForm })), {
   loading: () => <div className="h-32 bg-slate-50 animate-pulse rounded-lg" />,
-});
-const FileUploader = dynamicImport(() => import("@/components/file-uploader").then(mod => ({ default: mod.FileUploader })), {
-  loading: () => <div className="h-24 bg-slate-50 animate-pulse rounded-lg" />,
 });
 const EditProjectDialog = dynamicImport(() => import("@/components/edit-project-dialog").then(mod => ({ default: mod.EditProjectDialog })), {
   loading: () => null,
@@ -50,21 +47,6 @@ function getStatusBadge(status: string): { bg: string; text: string; border: str
 }
 
 // Helper function to format file size
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-}
-
-// Helper function to get file icon color
-function getFileIconColor(fileType: string): string {
-  if (fileType.includes("pdf")) return "text-red-400";
-  if (fileType.includes("image")) return "text-purple-400";
-  if (fileType.includes("zip")) return "text-purple-400";
-  if (fileType.includes("word") || fileType.includes("document")) return "text-indigo-400";
-  return "text-slate-400";
-}
-
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
   const { id } = await params;
@@ -92,13 +74,6 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   if (!project) {
     notFound();
   }
-
-  // Fetch project files
-  const projectFiles = await db
-    .select()
-    .from(files)
-    .where(eq(files.projectId, id))
-    .orderBy(desc(files.uploadedAt));
 
   // Fetch integrations for this project
   const integrations = await db
@@ -316,55 +291,6 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-5 order-1 lg:order-2">
-            {/* Files Section */}
-            <div className="[animation:animationIn_0.5s_ease-out_0.2s_both] animate-on-scroll">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-4 h-4 text-indigo-500" />
-                  <h2 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">
-                    Files ({projectFiles.length})
-                  </h2>
-                </div>
-                <FileUploader projectId={id} />
-              </div>
-
-              {projectFiles.length === 0 ? (
-                <div className="bg-white rounded-2xl p-6 text-center border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
-                  <FileText className="w-10 h-10 text-slate-300 mx-auto mb-2" strokeWidth={1.5} />
-                  <p className="text-slate-500 text-sm">No files uploaded yet</p>
-                  <p className="text-slate-400 text-xs mt-1">Upload project files using the button above</p>
-                </div>
-              ) : (
-                <div className="bg-white rounded-2xl divide-y divide-slate-100 border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
-                  {projectFiles.map((file) => (
-                    <div key={file.id} className="p-4 hover:bg-slate-50 transition-colors">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                          <FileText className={`w-5 h-5 mt-0.5 flex-shrink-0 ${getFileIconColor(file.fileType)}`} strokeWidth={1.5} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900 truncate">{file.name}</p>
-                            <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
-                              <span>{formatFileSize(file.fileSize)}</span>
-                              <span>•</span>
-                              <span>Uploaded {formatDistanceToNow(new Date(file.uploadedAt), { addSuffix: true })}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <a
-                          href={file.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-indigo-600 hover:text-indigo-700 transition-colors flex-shrink-0"
-                        >
-                          <Download className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Integrations Section */}
             <div className="[animation:animationIn_0.5s_ease-out_0.25s_both] animate-on-scroll">
               <IntegrationManagementSection

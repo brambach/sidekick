@@ -38,12 +38,6 @@ interface MessageReceivedNotification extends SlackNotificationBase {
   messagePreview: string;
 }
 
-interface FileUploadedNotification extends SlackNotificationBase {
-  type: "file_uploaded";
-  fileName: string;
-  uploaderName: string;
-}
-
 interface StatusChangedNotification extends SlackNotificationBase {
   type: "status_changed";
   oldStatus: string;
@@ -55,7 +49,6 @@ type SlackNotification =
   | TicketAssignedNotification
   | TicketResolvedNotification
   | MessageReceivedNotification
-  | FileUploadedNotification
   | StatusChangedNotification;
 
 function getPriorityEmoji(priority: string): string {
@@ -198,27 +191,6 @@ export async function sendSlackNotification(notification: SlackNotification): Pr
         ];
         break;
 
-      case "file_uploaded":
-        blocks = [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: `:file_folder: *File Uploaded* by ${notification.uploaderName}\n*${notification.fileName}*`,
-            },
-          },
-          {
-            type: "context",
-            elements: [
-              {
-                type: "mrkdwn",
-                text: `Client: ${notification.clientName}${notification.projectName ? ` | Project: ${notification.projectName}` : ""}`,
-              },
-            ],
-          },
-        ];
-        break;
-
       case "status_changed":
         blocks = [
           {
@@ -264,8 +236,6 @@ function getPlainTextFallback(notification: SlackNotification): string {
       return `Ticket resolved: ${notification.ticketTitle}`;
     case "message_received":
       return `New message from ${notification.senderName} (${notification.clientName})`;
-    case "file_uploaded":
-      return `File uploaded: ${notification.fileName} by ${notification.uploaderName}`;
     case "status_changed":
       return `Project status changed: ${notification.projectName} - ${notification.oldStatus} → ${notification.newStatus}`;
   }
@@ -340,24 +310,6 @@ export async function notifyMessageReceived(params: {
     clientName: params.clientName,
     projectName: params.projectName,
     messagePreview: params.messagePreview,
-    link: `${baseUrl}/dashboard/admin/projects/${params.projectId}`,
-  });
-}
-
-export async function notifyFileUploaded(params: {
-  fileName: string;
-  uploaderName: string;
-  clientName: string;
-  projectId: string;
-  projectName: string;
-}) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  return sendSlackNotification({
-    type: "file_uploaded",
-    fileName: params.fileName,
-    uploaderName: params.uploaderName,
-    clientName: params.clientName,
-    projectName: params.projectName,
     link: `${baseUrl}/dashboard/admin/projects/${params.projectId}`,
   });
 }

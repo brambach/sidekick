@@ -2,7 +2,6 @@ import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
   projects,
-  files,
   messages,
   users,
   integrationMonitors,
@@ -13,12 +12,9 @@ import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   Calendar,
-  FileText,
   MessageSquare,
   Clock,
-  Download,
   Activity,
-  FolderOpen,
   HelpCircle,
   Ticket,
   AlertCircle,
@@ -62,32 +58,6 @@ const statusConfig = {
   },
 } as const;
 
-// Helper function to format file size
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-}
-
-// Helper function to get file icon styling
-function getFileTypeInfo(fileType: string): {
-  color: string;
-  bg: string;
-  label: string;
-} {
-  if (fileType.includes("pdf"))
-    return { color: "text-red-600", bg: "bg-red-50", label: "PDF" };
-  if (fileType.includes("image"))
-    return { color: "text-violet-600", bg: "bg-violet-50", label: "Image" };
-  if (fileType.includes("zip"))
-    return { color: "text-amber-600", bg: "bg-amber-50", label: "Archive" };
-  if (fileType.includes("word") || fileType.includes("document"))
-    return { color: "text-blue-600", bg: "bg-blue-50", label: "Document" };
-  if (fileType.includes("sheet") || fileType.includes("excel"))
-    return { color: "text-emerald-600", bg: "bg-emerald-50", label: "Spreadsheet" };
-  return { color: "text-slate-600", bg: "bg-slate-50", label: "File" };
-}
-
 export default async function ClientProjectDetailPage({
   params,
 }: {
@@ -113,13 +83,6 @@ export default async function ClientProjectDetailPage({
   if (!project) {
     notFound();
   }
-
-  // Fetch project files
-  const projectFiles = await db
-    .select()
-    .from(files)
-    .where(eq(files.projectId, id))
-    .orderBy(desc(files.uploadedAt));
 
   // Fetch integrations for this project
   const integrations = await db
@@ -290,18 +253,6 @@ export default async function ClientProjectDetailPage({
 
                 <div className="flex items-center gap-2 text-slate-500">
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <FileText className="w-4 h-4 text-slate-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400">Files</p>
-                    <p className="font-medium text-slate-700">
-                      {projectFiles.length}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-slate-500">
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
                     <MessageSquare className="w-4 h-4 text-slate-600" />
                   </div>
                   <div>
@@ -323,83 +274,8 @@ export default async function ClientProjectDetailPage({
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Files & Integrations */}
+          {/* Left Column - Integrations */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Files Section */}
-            <section className="animate-fade-in-up opacity-0 stagger-3">
-              <div className="section-divider mb-4">
-                <FileText className="w-4 h-4 text-violet-500" />
-                <span>Project Files ({projectFiles.length})</span>
-              </div>
-
-              {projectFiles.length === 0 ? (
-                <div className="card-elevated">
-                  <div className="empty-state">
-                    <FolderOpen className="empty-state-icon" />
-                    <h3 className="empty-state-title">No files yet</h3>
-                    <p className="empty-state-description">
-                      Files will appear here when your team uploads them
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="card-elevated overflow-hidden divide-y divide-slate-100">
-                  {projectFiles.map((file, index) => {
-                    const typeInfo = getFileTypeInfo(file.fileType);
-                    return (
-                      <div
-                        key={file.id}
-                        className="p-4 hover:bg-slate-50/50 transition-colors group animate-fade-in-up opacity-0"
-                        style={{ animationDelay: `${0.2 + index * 0.03}s` }}
-                      >
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <div
-                              className={`w-10 h-10 rounded-xl ${typeInfo.bg} flex items-center justify-center flex-shrink-0`}
-                            >
-                              <FileText
-                                className={`w-5 h-5 ${typeInfo.color}`}
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-900 truncate group-hover:text-violet-700 transition-colors">
-                                {file.name}
-                              </p>
-                              <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-400">
-                                <span
-                                  className={`px-1.5 py-0.5 rounded ${typeInfo.bg} ${typeInfo.color} text-[10px] font-semibold`}
-                                >
-                                  {typeInfo.label}
-                                </span>
-                                <span>•</span>
-                                <span>{formatFileSize(file.fileSize)}</span>
-                                <span>•</span>
-                                <span>
-                                  {formatDistanceToNow(
-                                    new Date(file.uploadedAt),
-                                    { addSuffix: true }
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <a
-                            href={file.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-violet-600 hover:text-violet-700 hover:bg-violet-50 transition-colors text-sm font-medium flex-shrink-0"
-                          >
-                            <Download className="w-4 h-4" />
-                            <span className="hidden sm:inline">Download</span>
-                          </a>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-
             {/* Integrations Section */}
             <section className="animate-fade-in-up opacity-0 stagger-4">
               <div className="section-divider mb-4">

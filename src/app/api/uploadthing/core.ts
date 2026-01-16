@@ -8,40 +8,6 @@ import { eq, isNull, and } from "drizzle-orm";
 const f = createUploadthing();
 
 export const ourFileRouter = {
-  projectFile: f({
-    image: { maxFileSize: "32MB", maxFileCount: 10 },
-    pdf: { maxFileSize: "32MB", maxFileCount: 5 },
-    "application/zip": { maxFileSize: "32MB", maxFileCount: 2 },
-    "application/msword": { maxFileSize: "32MB", maxFileCount: 5 },
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
-      maxFileSize: "32MB",
-      maxFileCount: 5,
-    },
-    "application/vnd.ms-excel": { maxFileSize: "32MB", maxFileCount: 5 },
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
-      maxFileSize: "32MB",
-      maxFileCount: 5,
-    },
-  })
-    .middleware(async () => {
-      const { userId } = await auth();
-      if (!userId) throw new UploadThingError("Unauthorized");
-
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(and(eq(users.clerkId, userId), isNull(users.deletedAt)))
-        .limit(1);
-
-      if (!user) throw new UploadThingError("User not found");
-
-      return { userId: user.id };
-    })
-    .onUploadComplete(async ({ file, metadata }) => {
-      console.log("[Server] Upload complete:", file.name);
-      return { uploadedBy: metadata.userId };
-    }),
-
   agencyLogo: f({ image: { maxFileSize: "8MB", maxFileCount: 1 } })
     .middleware(async ({ req }) => {
       const { userId } = await auth();
