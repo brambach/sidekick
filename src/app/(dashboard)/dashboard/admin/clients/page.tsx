@@ -161,13 +161,13 @@ export default async function ClientsPage() {
         <div className="card-elevated overflow-hidden animate-fade-in-up opacity-0 stagger-2">
           {/* Table Header */}
           <div className="px-8 py-4 border-b border-slate-100 bg-slate-50/50">
-            <div className="grid grid-cols-12 gap-4 text-label text-slate-500">
-              <div className="col-span-4">Company</div>
-              <div className="col-span-3">Contact</div>
-              <div className="col-span-2 text-center">Projects</div>
-              <div className="col-span-1 text-center">Users</div>
-              <div className="col-span-1 text-center">Status</div>
-              <div className="col-span-1 text-right">Actions</div>
+            <div className="grid gap-8 text-label text-slate-500" style={{ gridTemplateColumns: '1.5fr 1.75fr 1fr 1fr 1fr 0.75fr' }}>
+              <div>Company</div>
+              <div>Contact</div>
+              <div className="text-center">Projects</div>
+              <div className="text-center">Users</div>
+              <div className="text-center">Status</div>
+              <div className="text-right">Actions</div>
             </div>
           </div>
 
@@ -188,9 +188,9 @@ export default async function ClientsPage() {
                   className="px-8 py-6 table-row group animate-fade-in-up opacity-0"
                   style={{ animationDelay: `${0.15 + index * 0.03}s` }}
                 >
-                  <div className="grid grid-cols-12 gap-4 items-center">
+                  <div className="grid gap-8 items-center" style={{ gridTemplateColumns: '1.5fr 1.75fr 1fr 1fr 1fr 0.75fr' }}>
                     {/* Company Info */}
-                    <div className="col-span-4">
+                    <div>
                       <Link
                         href={`/dashboard/admin/clients/${client.id}`}
                         className="flex items-center gap-3 group/link"
@@ -219,7 +219,7 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Contact */}
-                    <div className="col-span-3">
+                    <div>
                       <div className="flex flex-col">
                         <span className="text-sm text-slate-700 font-medium truncate">
                           {client.contactName}
@@ -235,7 +235,7 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Projects */}
-                    <div className="col-span-2">
+                    <div>
                       <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-2">
                           <FolderKanban className="w-4 h-4 text-blue-500" />
@@ -252,7 +252,7 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Users */}
-                    <div className="col-span-1">
+                    <div>
                       <div className="flex items-center justify-center gap-2">
                         <UserCircle className="w-4 h-4 text-slate-400" />
                         <span className="text-sm font-medium text-slate-700">
@@ -262,12 +262,12 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Status */}
-                    <div className="col-span-1 flex justify-center">
+                    <div className="flex justify-center">
                       <StatusBadge status={client.status} />
                     </div>
 
                     {/* Actions */}
-                    <div className="col-span-1 flex justify-end">
+                    <div className="flex justify-end">
                       <ClientStatusMenu
                         clientId={client.id}
                         currentStatus={client.status}
