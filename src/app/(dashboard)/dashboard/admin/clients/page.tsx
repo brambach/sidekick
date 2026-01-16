@@ -137,7 +137,7 @@ export default async function ClientsPage() {
   const totalUsers = clientData.reduce((sum, c) => sum + c.userCount, 0);
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC]">
+    <div className="bg-[#FAFBFC] pb-10">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-10">
         {/* Page Header */}
         <header className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-10 animate-fade-in-up opacity-0 stagger-1">
@@ -158,7 +158,7 @@ export default async function ClientsPage() {
         </header>
 
         {/* Table */}
-        <div className="card-elevated overflow-hidden animate-fade-in-up opacity-0 stagger-2">
+        <div className="card-elevated overflow-hidden animate-fade-in-up opacity-0 stagger-2 mb-6">
           {/* Table Header */}
           <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
             <div className="grid grid-cols-12 gap-4 text-label text-slate-500">
@@ -279,21 +279,35 @@ export default async function ClientsPage() {
               ))
             )}
           </div>
-        </div>
 
-        {/* Stats Footer */}
-        <div className="mt-6 grid grid-cols-3 gap-4 animate-fade-in-up opacity-0 stagger-5">
-          <div className="stat-card text-center">
-            <div className="stat-value">{clientData.length}</div>
-            <div className="stat-label">Total Clients</div>
-          </div>
-          <div className="stat-card text-center">
-            <div className="stat-value text-emerald-600">{activeCount}</div>
-            <div className="stat-label">Active</div>
-          </div>
-          <div className="stat-card text-center">
-            <div className="stat-value">{totalUsers}</div>
-            <div className="stat-label">Portal Users</div>
+          {/* Stats Footer - Moved inside table card */}
+          <div className="px-6 py-5 border-t border-slate-100 bg-slate-50/30">
+            <div className="grid grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-900 mb-1">
+                  {clientData.length}
+                </div>
+                <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                  Total Clients
+                </div>
+              </div>
+              <div className="text-center border-x border-slate-200">
+                <div className="text-2xl font-bold text-emerald-600 mb-1">
+                  {activeCount}
+                </div>
+                <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                  Active
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-900 mb-1">
+                  {totalUsers}
+                </div>
+                <div className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+                  Portal Users
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
