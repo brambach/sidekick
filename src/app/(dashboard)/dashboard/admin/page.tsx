@@ -236,9 +236,32 @@ export default async function AdminDashboard() {
                   </p>
                 </div>
               </div>
-              <Link href="/dashboard/admin/tickets" className="btn-primary">
-                Review Now
-                <ArrowRight className="w-4 h-4" />
+              <Link
+                href={
+                  stats.tickets.urgent > 0
+                    ? "/dashboard/admin/tickets"
+                    : "/dashboard/admin/projects"
+                }
+                className="btn-primary bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20 whitespace-nowrap"
+              >
+                {stats.tickets.urgent > 0 && stats.projects.overdue === 0 && (
+                  <>
+                    <Ticket className="w-4 h-4" />
+                    View Tickets
+                  </>
+                )}
+                {stats.projects.overdue > 0 && stats.tickets.urgent === 0 && (
+                  <>
+                    <FolderKanban className="w-4 h-4" />
+                    View Projects
+                  </>
+                )}
+                {stats.tickets.urgent > 0 && stats.projects.overdue > 0 && (
+                  <>
+                    <AlertTriangle className="w-4 h-4" />
+                    Review All
+                  </>
+                )}
               </Link>
             </div>
           </div>
