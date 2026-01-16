@@ -138,7 +138,7 @@ export default async function ClientDashboard() {
     <div className="min-h-screen bg-[#FAFBFC]">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-10">
         {/* Welcome Header */}
-        <header className="mb-10 animate-fade-in-up opacity-0 stagger-1">
+        <header className="mb-8 animate-fade-in-up opacity-0 stagger-1">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="w-4 h-4 text-violet-500" />
             <span className="text-label text-violet-600">Your Dashboard</span>
@@ -152,12 +152,10 @@ export default async function ClientDashboard() {
         </header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="stat-card animate-fade-in-up opacity-0 stagger-2">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                <FolderOpen className="w-5 h-5 text-slate-600" />
-              </div>
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
+              <FolderOpen className="w-5 h-5 text-slate-600" />
             </div>
             <div className="stat-value">{totalProjects}</div>
             <div className="stat-label">Total Projects</div>
@@ -166,10 +164,8 @@ export default async function ClientDashboard() {
           <div className="stat-card animate-fade-in-up opacity-0 stagger-2 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-violet-50/50 to-transparent pointer-events-none" />
             <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-violet-600" />
-                </div>
+              <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center mb-3">
+                <Clock className="w-5 h-5 text-violet-600" />
               </div>
               <div className="stat-value text-violet-700">{activeProjects}</div>
               <div className="stat-label">Active</div>
@@ -179,10 +175,8 @@ export default async function ClientDashboard() {
           <div className="stat-card animate-fade-in-up opacity-0 stagger-3 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-transparent pointer-events-none" />
             <div className="relative">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-emerald-600" />
-                </div>
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="stat-value text-emerald-700">
                 {completedProjects}
@@ -192,43 +186,38 @@ export default async function ClientDashboard() {
           </div>
 
           <div className="stat-card animate-fade-in-up opacity-0 stagger-3">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-slate-600" />
-              </div>
+            <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center mb-3">
+              <FileText className="w-5 h-5 text-slate-600" />
             </div>
             <div className="stat-value">{totalFiles}</div>
             <div className="stat-label">Files</div>
           </div>
         </div>
 
-        {/* Two Column Layout */}
-        <div className="grid lg:grid-cols-3 gap-6 mb-10">
-          {/* Support Hours - Takes 1 column */}
-          <div className="animate-fade-in-up opacity-0 stagger-4">
-            <div className="section-divider mb-4">
-              <Clock className="w-4 h-4 text-violet-500" />
-              <span>Support Hours</span>
-            </div>
-            <SupportHoursCard clientId={client.id} isAdmin={false} />
+        {/* Support Hours Section */}
+        <section className="mb-8 animate-fade-in-up opacity-0 stagger-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="w-4 h-4 text-violet-500" />
+            <h2 className="text-heading text-lg text-slate-900">Support Hours</h2>
           </div>
+          <SupportHoursCard clientId={client.id} isAdmin={false} />
+        </section>
 
-          {/* Integration Health - Takes 2 columns */}
-          <div className="lg:col-span-2 animate-fade-in-up opacity-0 stagger-4">
-            <div className="section-divider mb-4">
-              <Activity className="w-4 h-4 text-emerald-500" />
-              <span>Integration Health</span>
-            </div>
-            <IntegrationHealthGrid clientId={client.id} />
+        {/* Integration Health Section */}
+        <section className="mb-8 animate-fade-in-up opacity-0 stagger-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Activity className="w-4 h-4 text-emerald-500" />
+            <h2 className="text-heading text-lg text-slate-900">Integration Health</h2>
           </div>
-        </div>
+          <IntegrationHealthGrid clientId={client.id} />
+        </section>
 
         {/* Projects Section */}
-        <section className="animate-fade-in-up opacity-0 stagger-5">
-          <div className="flex items-center justify-between mb-6">
-            <div className="section-divider flex-1">
+        <section className="animate-fade-in-up opacity-0 stagger-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-blue-500" />
-              <span>Your Projects</span>
+              <h2 className="text-heading text-lg text-slate-900">Your Projects</h2>
             </div>
             <Link
               href="/dashboard/client/projects"
@@ -251,7 +240,7 @@ export default async function ClientDashboard() {
               </div>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2 gap-5">
               {projectData.slice(0, 4).map((project, index) => {
                 const config =
                   statusConfig[project.status as keyof typeof statusConfig] ||
@@ -265,7 +254,7 @@ export default async function ClientDashboard() {
                   <Link
                     key={project.id}
                     href={`/dashboard/client/projects/${project.id}`}
-                    className="card-interactive p-5 group animate-fade-in-up opacity-0"
+                    className="card-interactive p-6 group animate-fade-in-up opacity-0"
                     style={{ animationDelay: `${0.3 + index * 0.05}s` }}
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
