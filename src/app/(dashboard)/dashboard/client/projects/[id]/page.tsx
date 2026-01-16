@@ -19,7 +19,6 @@ import {
   Download,
   Activity,
   FolderOpen,
-  ExternalLink,
   HelpCircle,
   Ticket,
   AlertCircle,
@@ -469,40 +468,6 @@ export default async function ClientProjectDetailPage({
                 >
                   <Ticket className="w-4 h-4" />
                   Create Support Ticket
-                </Link>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div className="card-elevated p-4 animate-fade-in-up opacity-0 stagger-5">
-              <h3 className="text-label text-slate-500 mb-3">Quick Links</h3>
-              <div className="space-y-2">
-                <Link
-                  href="/dashboard/client"
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors group"
-                >
-                  <span className="text-sm text-slate-600 group-hover:text-slate-900">
-                    Dashboard
-                  </span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-violet-500" />
-                </Link>
-                <Link
-                  href="/dashboard/client/projects"
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors group"
-                >
-                  <span className="text-sm text-slate-600 group-hover:text-slate-900">
-                    All Projects
-                  </span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-violet-500" />
-                </Link>
-                <Link
-                  href="/dashboard/client/tickets"
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 transition-colors group"
-                >
-                  <span className="text-sm text-slate-600 group-hover:text-slate-900">
-                    Support Tickets
-                  </span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-violet-500" />
                 </Link>
               </div>
             </div>
