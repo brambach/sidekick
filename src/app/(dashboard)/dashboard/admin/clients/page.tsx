@@ -158,16 +158,16 @@ export default async function ClientsPage() {
         </header>
 
         {/* Table */}
-        <div className="card-elevated overflow-hidden animate-fade-in-up opacity-0 stagger-2">
+        <div className="card-elevated overflow-visible animate-fade-in-up opacity-0 stagger-2">
           {/* Table Header */}
           <div className="px-8 py-4 border-b border-slate-100 bg-slate-50/50">
-            <div className="grid gap-8 text-label text-slate-500" style={{ gridTemplateColumns: '1.5fr 1.75fr 1fr 1fr 1fr 0.75fr' }}>
-              <div>Company</div>
-              <div>Contact</div>
-              <div className="text-center">Projects</div>
-              <div className="text-center">Users</div>
-              <div className="text-center">Status</div>
-              <div className="text-right">Actions</div>
+            <div className="grid gap-6 text-label text-slate-500" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1fr 0.75fr' }}>
+              <div className="min-w-0">Company</div>
+              <div className="min-w-0">Contact</div>
+              <div className="min-w-0 text-center">Projects</div>
+              <div className="min-w-0 text-center">Users</div>
+              <div className="min-w-0 text-center">Status</div>
+              <div className="min-w-0 text-right">Actions</div>
             </div>
           </div>
 
@@ -185,17 +185,19 @@ export default async function ClientsPage() {
               clientData.map((client, index) => (
                 <div
                   key={client.id}
-                  className="px-8 py-6 table-row group animate-fade-in-up opacity-0"
-                  style={{ animationDelay: `${0.15 + index * 0.03}s` }}
+                  className="px-8 py-6 table-row group animate-fade-in-up opacity-0 grid gap-6 items-center"
+                  style={{
+                    animationDelay: `${0.15 + index * 0.03}s`,
+                    gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1fr 0.75fr'
+                  }}
                 >
-                  <div className="grid gap-8 items-center" style={{ gridTemplateColumns: '1.5fr 1.75fr 1fr 1fr 1fr 0.75fr' }}>
                     {/* Company Info */}
-                    <div>
+                    <div className="min-w-0">
                       <Link
                         href={`/dashboard/admin/clients/${client.id}`}
                         className="flex items-center gap-3 group/link"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm group-hover/link:scale-105 transition-transform">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm group-hover/link:scale-105 transition-transform flex-shrink-0">
                           {client.companyName
                             .split(" ")
                             .map((word) => word[0])
@@ -219,8 +221,8 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Contact */}
-                    <div>
-                      <div className="flex flex-col">
+                    <div className="min-w-0">
+                      <div className="flex flex-col min-w-0">
                         <span className="text-sm text-slate-700 font-medium truncate">
                           {client.contactName}
                         </span>
@@ -229,13 +231,13 @@ export default async function ClientsPage() {
                           className="text-xs text-slate-400 hover:text-violet-600 truncate transition-colors flex items-center gap-1"
                         >
                           <Mail className="w-3 h-3 flex-shrink-0" />
-                          {client.contactEmail}
+                          <span className="truncate">{client.contactEmail}</span>
                         </a>
                       </div>
                     </div>
 
                     {/* Projects */}
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex flex-col items-center gap-1">
                         <div className="flex items-center gap-2">
                           <FolderKanban className="w-4 h-4 text-blue-500" />
@@ -252,7 +254,7 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Users */}
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center justify-center gap-2">
                         <UserCircle className="w-4 h-4 text-slate-400" />
                         <span className="text-sm font-medium text-slate-700">
@@ -262,19 +264,18 @@ export default async function ClientsPage() {
                     </div>
 
                     {/* Status */}
-                    <div className="flex justify-center">
+                    <div className="min-w-0 flex justify-center">
                       <StatusBadge status={client.status} />
                     </div>
 
                     {/* Actions */}
-                    <div className="flex justify-end">
+                    <div className="min-w-0 flex justify-end">
                       <ClientStatusMenu
                         clientId={client.id}
                         currentStatus={client.status}
                         companyName={client.companyName}
                       />
                     </div>
-                  </div>
                 </div>
               ))
             )}
