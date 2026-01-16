@@ -42,7 +42,7 @@ export default async function DashboardLayout({
       ];
 
   return (
-    <div className="min-h-screen bg-[#F9FAFF] relative">
+    <div className="bg-[#F9FAFF] relative">
       {/* Ambient Background Gradient */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-100/40 via-purple-50/10 to-transparent pointer-events-none z-0"></div>
 
@@ -50,7 +50,7 @@ export default async function DashboardLayout({
       <TopNavWrapper navItems={navItems} isAdmin={isAdmin} />
 
       {/* Main Content */}
-      <main className="relative z-10">{children}</main>
+      <main className="relative z-10 min-h-[calc(100vh-4rem)] pb-12">{children}</main>
     </div>
   );
 }

@@ -160,7 +160,7 @@ export default async function ClientsPage() {
         {/* Table */}
         <div className="card-elevated overflow-hidden animate-fade-in-up opacity-0 stagger-2">
           {/* Table Header */}
-          <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+          <div className="px-8 py-4 border-b border-slate-100 bg-slate-50/50">
             <div className="grid grid-cols-12 gap-4 text-label text-slate-500">
               <div className="col-span-4">Company</div>
               <div className="col-span-3">Contact</div>
@@ -185,7 +185,7 @@ export default async function ClientsPage() {
               clientData.map((client, index) => (
                 <div
                   key={client.id}
-                  className="px-6 py-5 table-row group animate-fade-in-up opacity-0"
+                  className="px-8 py-6 table-row group animate-fade-in-up opacity-0"
                   style={{ animationDelay: `${0.15 + index * 0.03}s` }}
                 >
                   <div className="grid grid-cols-12 gap-4 items-center">
@@ -282,7 +282,7 @@ export default async function ClientsPage() {
         </div>
 
         {/* Stats Footer */}
-        <div className="mt-8 grid grid-cols-3 gap-4 animate-fade-in-up opacity-0 stagger-5">
+        <div className="mt-6 grid grid-cols-3 gap-4 animate-fade-in-up opacity-0 stagger-5">
           <div className="stat-card text-center">
             <div className="stat-value">{clientData.length}</div>
             <div className="stat-label">Total Clients</div>
