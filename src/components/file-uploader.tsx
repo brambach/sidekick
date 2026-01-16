@@ -13,15 +13,24 @@ export function FileUploader({ projectId }: { projectId: string }) {
 
   const { startUpload, isUploading: uploadThingLoading } = useUploadThing("projectFile", {
     onBeforeUploadBegin: (files) => {
+      console.log("Starting upload for files:", files);
       setIsUploading(true);
       return files;
     },
     onClientUploadComplete: async (res) => {
-      console.log("Upload complete, saving files to database:", res);
+      console.log("✅ UploadThing upload complete:", res);
+      console.log("Now saving to database...");
+
       // Save each uploaded file to the database
       try {
         for (const file of res) {
-          console.log("Saving file:", file);
+          console.log("Saving file to DB:", {
+            name: file.name,
+            url: file.url,
+            size: file.size,
+            type: file.type
+          });
+
           const response = await fetch("/api/files", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -34,27 +43,30 @@ export function FileUploader({ projectId }: { projectId: string }) {
             }),
           });
 
+          console.log("API response status:", response.status);
+
           if (!response.ok) {
             const errorText = await response.text();
-            console.error("API error response:", errorText);
+            console.error("❌ API error response:", errorText);
             throw new Error(`Failed to save file: ${errorText}`);
           }
 
           const result = await response.json();
-          console.log("File saved successfully:", result);
+          console.log("✅ File saved to DB successfully:", result);
         }
 
+        console.log("All files processed, refreshing page...");
         toast.success(`${res.length} file${res.length > 1 ? 's' : ''} uploaded successfully`);
         setIsUploading(false);
         router.refresh();
       } catch (error) {
-        console.error("Error saving files:", error);
+        console.error("❌ Error in onClientUploadComplete:", error);
         toast.error(error instanceof Error ? error.message : "Failed to save files. Please try again.");
         setIsUploading(false);
       }
     },
     onUploadError: (error: Error) => {
-      console.error("Upload error:", error.message);
+      console.error("❌ UploadThing error:", error);
       toast.error(`Upload failed: ${error.message}`);
       setIsUploading(false);
     },
