@@ -60,13 +60,13 @@ export function IntegrationHealthGrid({
 
   if (integrations.length === 0) {
     return (
-      <div className="bg-white rounded-xl border-2 border-dashed border-gray-200 p-12 text-center shadow-sm">
-        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3 text-gray-400">
+      <div className="bg-white rounded-xl border border-gray-100 p-12 text-center shadow-sm">
+        <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-500">
           <Activity className="w-6 h-6" />
         </div>
-        <h3 className="text-gray-900 font-bold text-base mb-1">No integrations configured</h3>
+        <h3 className="text-gray-900 font-bold text-base mb-2">All Systems Healthy</h3>
         <p className="text-gray-500 text-sm max-w-xs mx-auto">
-          Contact your Digital Directions consultant to set up integration monitoring
+          No integration monitoring has been configured yet. Your team will set this up when needed.
         </p>
       </div>
     );

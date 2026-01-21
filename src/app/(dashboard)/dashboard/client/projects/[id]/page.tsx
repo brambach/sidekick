@@ -83,7 +83,7 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
   const StatusIcon = currentStatus.icon;
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#F2F4F7] p-6 lg:p-10 space-y-8 no-scrollbar relative font-geist">
+    <div className="flex-1 overflow-y-auto bg-[#F2F4F7] p-6 lg:p-10 space-y-6 no-scrollbar relative font-geist">
       <AnimateOnScroll />
 
       {/* Back & Breadcrumb */}
@@ -113,7 +113,7 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
                   </p>
                 </div>
                 <div className="hidden sm:block">
-                  <div className="w-16 h-16 rounded-xl bg-gray-900 flex items-center justify-center text-white text-2xl font-bold shadow-sm">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6366F1] to-[#818cf8] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-indigo-200">
                     {project.name.charAt(0)}
                   </div>
                 </div>
@@ -122,15 +122,18 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
 
             {/* Bottom Action Area */}
             <div className="flex flex-wrap gap-3 items-center mt-8">
-              <Link href="/dashboard/client/tickets/new">
+              <Link href="/dashboard/client/tickets">
                 <Button size="sm" className="rounded-xl font-semibold shadow-sm">
                   <Plus className="w-4 h-4 mr-2" />
-                  Request Change
+                  Request Project Change
                 </Button>
               </Link>
-              <Button variant="outline" size="sm" className="rounded-xl font-semibold">
-                View Documents
-              </Button>
+              <Link href="/dashboard/client/tickets">
+                <Button variant="outline" size="sm" className="rounded-xl font-semibold">
+                  <HelpCircle className="w-4 h-4 mr-2" />
+                  Get Support
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -171,7 +174,7 @@ export default async function ClientProjectDetailPage({ params }: { params: Prom
 
       <div className="grid grid-cols-12 gap-6 animate-enter delay-400">
         {/* Roadmap & Integrations */}
-        <div className="col-span-12 lg:col-span-8 space-y-6">
+        <div className="col-span-12 lg:col-span-8 space-y-8">
           {/* Phase Manager */}
           <section>
             <div className="flex items-center justify-between mb-4">

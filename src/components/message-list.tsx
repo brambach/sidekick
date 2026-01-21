@@ -57,9 +57,16 @@ const MessageListComponent = ({ projectId, initialMessages }: MessageListProps) 
 
   if (messages.length === 0) {
     return (
-      <div className="bg-white rounded-lg p-8 text-center border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)]">
-        <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" strokeWidth={1.5} />
-        <p className="text-slate-400 text-sm">No messages yet</p>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center p-8">
+          <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-500">
+            <MessageSquare className="w-6 h-6" />
+          </div>
+          <h3 className="text-gray-900 font-bold text-base mb-2">Start a Conversation</h3>
+          <p className="text-gray-500 text-sm max-w-xs mx-auto">
+            Send a message below to communicate with your project team.
+          </p>
+        </div>
       </div>
     );
   }

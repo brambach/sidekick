@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Gift, Bell, PlusCircle } from "lucide-react";
+import { Search } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { NotificationBell } from "@/components/notification-bell";
 
@@ -26,17 +26,7 @@ export function AdminHeader() {
 
             {/* Right Tools */}
             <div className="flex items-center gap-6">
-                <div className="flex items-center gap-4">
-                    <button className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-50 active:scale-95 duration-100 hidden sm:block">
-                        <Gift className="w-5 h-5 stroke-[1.5]" />
-                    </button>
-
-                    <NotificationBell />
-
-                    <button className="text-gray-400 hover:text-[#6366F1] transition-colors p-2 rounded-full hover:bg-indigo-50 active:scale-95 duration-100 hidden sm:block">
-                        <PlusCircle className="w-5 h-5 stroke-[1.5]" />
-                    </button>
-                </div>
+                <NotificationBell />
 
                 <div className="h-8 w-px bg-gray-100 hidden sm:block"></div>
 

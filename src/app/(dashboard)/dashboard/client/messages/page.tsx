@@ -1,7 +1,7 @@
 import { requireAuth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, humans, clients, users } from "@/lib/db/schema";
-import { eq, isNull, desc } from "drizzle-orm";
+import { projects, clients } from "@/lib/db/schema";
+import { eq, isNull, desc, and } from "drizzle-orm";
 import { MessagesInterface } from "@/components/messages-interface";
 
 export default async function ClientMessagesPage() {
@@ -27,8 +27,10 @@ export default async function ClientMessagesPage() {
             .from(projects)
             .leftJoin(clients, eq(projects.clientId, clients.id))
             .where(
-                eq(projects.clientId, user.clientId),
-                isNull(projects.deletedAt)
+                and(
+                    eq(projects.clientId, user.clientId),
+                    isNull(projects.deletedAt)
+                )
             )
             .orderBy(desc(projects.updatedAt));
     }

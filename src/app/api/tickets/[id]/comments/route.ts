@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { tickets, ticketComments, users, clients } from "@/lib/db/schema";
 import { eq, and, isNull, desc, or } from "drizzle-orm";
 import { sendTicketResponseEmail } from "@/lib/email";
+import { notifyTicketResponse } from "@/lib/notifications";
 
 export async function GET(
   req: NextRequest,
@@ -207,9 +208,19 @@ export async function POST(
       .set({ updatedAt: new Date() })
       .where(eq(tickets.id, id));
 
-    // Send email notification when admin responds (not internal notes)
+    // Send email and in-app notification when admin responds (not internal notes)
     if (user.role === "admin" && !internal) {
-      // Get client info
+      // Get responder name from Clerk
+      let responderName = "Digital Directions Team";
+      try {
+        const clerk = await clerkClient();
+        const clerkUser = await clerk.users.getUser(userId);
+        responderName = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Digital Directions Team";
+      } catch {
+        // Keep default name
+      }
+
+      // Get client info for email
       const client = await db
         .select({
           contactName: clients.contactName,
@@ -220,17 +231,8 @@ export async function POST(
         .limit(1)
         .then((rows) => rows[0]);
 
+      // Send email notification
       if (client?.contactEmail) {
-        // Get responder name from Clerk
-        let responderName = "Digital Directions Team";
-        try {
-          const clerk = await clerkClient();
-          const clerkUser = await clerk.users.getUser(userId);
-          responderName = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Digital Directions Team";
-        } catch {
-          // Keep default name
-        }
-
         sendTicketResponseEmail({
           to: client.contactEmail,
           recipientName: client.contactName,
@@ -240,6 +242,15 @@ export async function POST(
           responsePreview: content,
         }).catch((err) => console.error("Email notification failed:", err));
       }
+
+      // Create in-app notification for client users
+      notifyTicketResponse({
+        ticketId: id,
+        ticketTitle: ticket.title,
+        clientId: ticket.clientId,
+        responderName,
+        responsePreview: content,
+      }).catch((err) => console.error("In-app notification failed:", err));
     }
 
     return NextResponse.json(newComment[0], { status: 201 });

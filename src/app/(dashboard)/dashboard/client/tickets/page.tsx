@@ -99,102 +99,119 @@ export default async function ClientTicketsPage() {
 
       {/* FAQ Section */}
       <div className="animate-enter delay-200">
-        <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden bg-white">
-          <div className="p-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-            <div className="space-y-4">
-              {/* FAQ Item 1 */}
-              <details className="group border-b border-gray-100 pb-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    How do I track my project progress?
-                  </span>
-                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                  Visit the Projects page from the sidebar to see all your active projects. Each project has a detailed page showing the roadmap progress, current phase, and system health. You'll receive automatic updates as your project moves through each phase.
+        <div className="bg-[#F9FAFB] rounded-xl p-8 border border-gray-100">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+          <div className="space-y-3">
+            {/* FAQ Item 1 */}
+            <details className="group bg-white rounded-xl border border-[#E5E7EB] hover:border-gray-300 transition-all">
+              <summary className="flex items-center justify-between cursor-pointer list-none p-5">
+                <span className="text-sm font-medium text-gray-900">
+                  How do I track my project progress?
+                </span>
+                <svg className="w-6 h-6 text-gray-400 group-open:text-[#6366F1] group-open:rotate-180 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="px-5 pb-5">
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  Visit the Projects page from the sidebar to see all your active projects. Each project has a detailed page showing the roadmap progress, current phase, and system health. You&apos;ll receive automatic updates as your project moves through each phase.
                 </p>
-              </details>
+              </div>
+            </details>
 
-              {/* FAQ Item 2 */}
-              <details className="group border-b border-gray-100 pb-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    How do I access project files and documents?
-                  </span>
-                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {/* FAQ Item 2 */}
+            <details className="group bg-white rounded-xl border border-[#E5E7EB] hover:border-gray-300 transition-all">
+              <summary className="flex items-center justify-between cursor-pointer list-none p-5">
+                <span className="text-sm font-medium text-gray-900">
+                  How do I access project files and documents?
+                </span>
+                <svg className="w-6 h-6 text-gray-400 group-open:text-[#6366F1] group-open:rotate-180 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="px-5 pb-5">
+                <p className="text-sm text-[#6B7280] leading-relaxed">
                   All project files are available on your project detail page. Click on any project, then scroll to the Files section. You can download files directly or view them in your browser. Files are organized by upload date with the most recent at the top.
                 </p>
-              </details>
+              </div>
+            </details>
 
-              {/* FAQ Item 3 */}
-              <details className="group border-b border-gray-100 pb-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    What's the best way to communicate with my team?
-                  </span>
-                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+            {/* FAQ Item 3 */}
+            <details className="group bg-white rounded-xl border border-[#E5E7EB] hover:border-gray-300 transition-all">
+              <summary className="flex items-center justify-between cursor-pointer list-none p-5">
+                <span className="text-sm font-medium text-gray-900">
+                  What&apos;s the best way to communicate with my team?
+                </span>
+                <svg className="w-6 h-6 text-gray-400 group-open:text-[#6366F1] group-open:rotate-180 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="px-5 pb-5">
+                <p className="text-sm text-[#6B7280] leading-relaxed">
                   Use the Project Chat feature on each project page for quick questions and updates. For more complex issues or formal requests, submit a support ticket here in the Help Center. All communication is tracked and visible in your portal history.
                 </p>
-              </details>
+              </div>
+            </details>
 
-              {/* FAQ Item 4 */}
-              <details className="group border-b border-gray-100 pb-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    How long does it take to get a response to my ticket?
-                  </span>
-                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                  Most support tickets receive an initial response within 4 business hours. Urgent issues are prioritized and typically addressed within 1-2 hours. You'll receive email notifications when your ticket status changes or when our team adds a comment.
+            {/* FAQ Item 4 */}
+            <details className="group bg-white rounded-xl border border-[#E5E7EB] hover:border-gray-300 transition-all">
+              <summary className="flex items-center justify-between cursor-pointer list-none p-5">
+                <span className="text-sm font-medium text-gray-900">
+                  How long does it take to get a response to my ticket?
+                </span>
+                <svg className="w-6 h-6 text-gray-400 group-open:text-[#6366F1] group-open:rotate-180 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="px-5 pb-5">
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  Most support tickets receive an initial response within 4 business hours. Urgent issues are prioritized and typically addressed within 1-2 hours. You&apos;ll receive email notifications when your ticket status changes or when our team adds a comment.
                 </p>
-              </details>
+              </div>
+            </details>
 
-              {/* FAQ Item 5 */}
-              <details className="group border-b border-gray-100 pb-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    Can I invite additional team members to the portal?
-                  </span>
-                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                  Yes! Contact your Digital Directions consultant or submit a support ticket with the email addresses of team members you'd like to invite. They'll receive an invitation email with instructions to create their account and access your projects.
+            {/* FAQ Item 5 */}
+            <details className="group bg-white rounded-xl border border-[#E5E7EB] hover:border-gray-300 transition-all">
+              <summary className="flex items-center justify-between cursor-pointer list-none p-5">
+                <span className="text-sm font-medium text-gray-900">
+                  Can I invite additional team members to the portal?
+                </span>
+                <svg className="w-6 h-6 text-gray-400 group-open:text-[#6366F1] group-open:rotate-180 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="px-5 pb-5">
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  Yes! Contact your Digital Directions consultant or submit a support ticket with the email addresses of team members you&apos;d like to invite. They&apos;ll receive an invitation email with instructions to create their account and access your projects.
                 </p>
-              </details>
+              </div>
+            </details>
 
-              {/* FAQ Item 6 */}
-              <details className="group pb-4">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    What should I do if I notice an integration issue?
-                  </span>
-                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                  Integration health is monitored automatically every 5 minutes. If you notice an issue before we do, please submit an urgent support ticket with details about what you're experiencing. Include any error messages or screenshots to help us resolve it quickly.
+            {/* FAQ Item 6 */}
+            <details className="group bg-white rounded-xl border border-[#E5E7EB] hover:border-gray-300 transition-all">
+              <summary className="flex items-center justify-between cursor-pointer list-none p-5">
+                <span className="text-sm font-medium text-gray-900">
+                  What should I do if I notice an integration issue?
+                </span>
+                <svg className="w-6 h-6 text-gray-400 group-open:text-[#6366F1] group-open:rotate-180 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div className="px-5 pb-5">
+                <p className="text-sm text-[#6B7280] leading-relaxed">
+                  Integration health is monitored automatically every 5 minutes. If you notice an issue before we do, please submit an urgent support ticket with details about what you&apos;re experiencing. Include any error messages or screenshots to help us resolve it quickly.
                 </p>
-              </details>
-            </div>
+              </div>
+            </details>
           </div>
-        </Card>
+        </div>
+      </div>
+
+      {/* Section Divider */}
+      <div className="flex items-center gap-4 animate-enter delay-250">
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+        <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Need More Help?</span>
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       </div>
 
       {/* Stats Row */}

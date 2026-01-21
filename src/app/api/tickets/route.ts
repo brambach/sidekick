@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { tickets, users, clients, projects } from "@/lib/db/schema";
 import { eq, and, isNull, desc, sql, or } from "drizzle-orm";
 import { notifyTicketCreated } from "@/lib/slack";
+import { notifyNewTicket } from "@/lib/notifications";
 
 export async function GET(req: NextRequest) {
   try {
@@ -253,6 +254,16 @@ export async function POST(req: NextRequest) {
       projectName = project?.name;
     }
 
+    // Get creator name from Clerk
+    let creatorName = "User";
+    try {
+      const clerk = await clerkClient();
+      const clerkUser = await clerk.users.getUser(userId);
+      creatorName = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "User";
+    } catch {
+      // Keep default name
+    }
+
     // Send Slack notification (fire and forget)
     notifyTicketCreated({
       ticketTitle: title,
@@ -262,6 +273,17 @@ export async function POST(req: NextRequest) {
       priority: priority || "medium",
       ticketType: type || "general_support",
     }).catch((err) => console.error("Slack notification failed:", err));
+
+    // Create in-app notification for admins (only for client-created tickets)
+    if (user.role === "client") {
+      notifyNewTicket({
+        ticketId: newTicket[0].id,
+        ticketTitle: title,
+        clientName: client?.companyName || "Unknown Client",
+        creatorName,
+        priority: priority || "medium",
+      }).catch((err) => console.error("In-app notification failed:", err));
+    }
 
     return NextResponse.json(newTicket[0], { status: 201 });
   } catch (error) {

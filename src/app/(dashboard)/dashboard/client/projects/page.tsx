@@ -5,18 +5,12 @@ import { eq, isNull, and, desc, sql } from "drizzle-orm";
 import Link from "next/link";
 import {
   FolderOpen,
-  MessageSquare,
   Clock,
   AlertCircle,
-  Layers,
-  Search,
-  Filter,
   ArrowUpRight,
-  Plus
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -61,20 +55,6 @@ export default async function ClientProjectsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Projects</h1>
           <p className="text-sm text-gray-500 mt-1.5">Status board for all active implementations and deliveries.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="relative group hidden md:block">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-[#6366F1] transition-colors" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              className="pl-11 pr-4 py-2.5 w-72 bg-gray-50/50 border border-gray-100 rounded-xl text-sm outline-none focus:bg-white focus:ring-2 focus:ring-[#6366F1]/10 focus:border-[#6366F1]/20 transition-all"
-            />
-          </div>
-          <Button variant="outline" size="sm" className="rounded-xl font-semibold text-gray-500">
-            <Filter className="w-4 h-4 mr-2" />
-            Filter
-          </Button>
         </div>
       </div>
 
@@ -146,34 +126,10 @@ function ProjectCard({ project, index }: any) {
           {project.description || 'Full deliverable roadmap, execution metrics and pipeline visibility for this implementation.'}
         </p>
 
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center text-[9px] font-bold uppercase tracking-widest text-gray-400">
-              <span>Project Velocity</span>
-              <span className="text-[#6366F1]">65%</span>
-            </div>
-            <div className="h-1.5 w-full bg-gray-50 rounded-full overflow-hidden border border-gray-100/50">
-              <div
-                className="h-full bg-gradient-to-r from-[#6366F1] to-[#818CF8] rounded-full transition-all duration-1000 ease-out"
-                style={{ width: '65%', animation: 'growBar 1.5s var(--ease-premium) forwards' }}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between pt-4 border-t border-gray-50/50">
-            <div className="flex items-center gap-1.5 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
-              <div className="w-6 h-6 rounded-lg bg-gray-100 border-2 border-white shadow-sm overflow-hidden">
-                <img src="https://i.pravatar.cc/100?img=1" alt="Team" className="w-full h-full object-cover" />
-              </div>
-              <div className="w-6 h-6 rounded-lg bg-gray-200 border-2 border-white shadow-sm overflow-hidden -ml-2.5">
-                <img src="https://i.pravatar.cc/100?img=2" alt="Team" className="w-full h-full object-cover" />
-              </div>
-              <span className="text-[9px] font-bold text-gray-400 ml-1.5">Team +2</span>
-            </div>
-            <div className="flex items-center gap-1 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-              <Clock className="w-3 h-3" />
-              <span>Updated 2h ago</span>
-            </div>
+        <div className="flex items-center justify-between pt-4 border-t border-gray-50/50 mt-4">
+          <div className="flex items-center gap-1 text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+            <Clock className="w-3 h-3" />
+            <span>Updated {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}</span>
           </div>
         </div>
       </div>

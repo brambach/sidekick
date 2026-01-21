@@ -5,7 +5,7 @@ import { eq, isNull, and, desc } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { clerkClient } from "@clerk/nextjs/server";
-import { ArrowLeft, Layout, User, Clock, MessageSquare, Mail, Link as LinkIcon } from "lucide-react";
+import { ArrowLeft, Layout, User, Clock, MessageSquare, Mail, Link as LinkIcon, Activity, CheckCircle, AlertCircle, Calendar } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import dynamicImport from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -70,13 +70,17 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
     .where(and(eq(messages.projectId, id), isNull(messages.deletedAt)))
     .then((rows) => rows.length);
 
-  const statusColors: any = {
-    planning: 'bg-indigo-100/50 text-indigo-700',
-    in_progress: 'bg-emerald-100/50 text-emerald-700',
-    review: 'bg-amber-100/50 text-amber-700',
-    completed: 'bg-gray-100/50 text-gray-600',
-    on_hold: 'bg-rose-100/50 text-rose-700'
+  // Status styling
+  const statusConfig: any = {
+    planning: { color: "bg-indigo-50 text-indigo-600", label: "Planning Phase", icon: Layout },
+    in_progress: { color: "bg-emerald-50 text-emerald-600", label: "In Active Development", icon: Activity },
+    review: { color: "bg-amber-50 text-amber-600", label: "Under Review", icon: CheckCircle },
+    completed: { color: "bg-gray-50 text-gray-600", label: "Project Completed", icon: CheckCircle },
+    on_hold: { color: "bg-rose-50 text-rose-600", label: "On Hold", icon: AlertCircle },
   };
+
+  const currentStatus = statusConfig[project.status] || statusConfig.planning;
+  const StatusIcon = currentStatus.icon;
 
   const now = new Date();
   const daysLeft = project.dueDate ? differenceInDays(new Date(project.dueDate), now) : null;
@@ -85,91 +89,86 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
     <div className="flex-1 overflow-y-auto bg-[#F2F4F7] p-6 lg:p-10 space-y-6 no-scrollbar relative font-geist">
       <AnimateOnScroll />
 
-      {/* Header */}
-      <div className="flex items-center justify-between animate-enter delay-100">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/admin/projects" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm text-gray-500">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-xl font-bold text-gray-900">Project Details</h1>
-        </div>
-        <div className="flex gap-3">
-          <EditProjectDialog
-            project={{
-              id: project.id,
-              name: project.name,
-              description: project.description,
-              startDate: project.startDate,
-              dueDate: project.dueDate,
-            }}
-          />
-          <UpdateStatusDialog projectId={project.id} currentStatus={project.status} />
-        </div>
+      {/* Back & Breadcrumb */}
+      <div className="flex items-center gap-2 animate-enter delay-100">
+        <Link href="/dashboard/admin/projects" className="w-10 h-10 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm text-gray-400 hover:text-gray-900">
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <span className="text-gray-400 font-bold text-sm">/ {project.name}</span>
       </div>
 
       <div className="grid grid-cols-12 gap-6">
-        {/* Main Hero Card */}
+        {/* Main Hero (Left) */}
         <div className="col-span-12 lg:col-span-8 animate-enter delay-200">
-          <div className="bg-white rounded-xl p-8 lg:p-10 shadow-sm border border-gray-100 min-h-[400px] flex flex-col">
-            {/* Header */}
-            <div className="flex justify-between items-start mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center text-white text-xl font-bold">
-                  {project.name.charAt(0)}
-                </div>
+          <div className="bg-white rounded-xl p-8 lg:p-10 shadow-sm border border-gray-100 h-full min-h-[400px] flex flex-col justify-between">
+            <div>
+              <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900 tracking-tight">{project.name}</h2>
-                  <p className="text-gray-500 font-medium text-sm">{project.clientName}</p>
+                  <span className={cn("inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4", currentStatus.color)}>
+                    <StatusIcon className="w-3.5 h-3.5" />
+                    {currentStatus.label}
+                  </span>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-3">
+                    {project.name}
+                  </h1>
+                  <p className="text-gray-500 text-base max-w-xl">
+                    {project.description || "Track project progress and manage deliverables across all implementation phases."}
+                  </p>
+                </div>
+                <div className="hidden sm:block">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#6366F1] to-[#818cf8] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-indigo-200">
+                    {project.name.charAt(0)}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Description */}
-            <div className="flex-1">
-              <p className="text-gray-500 text-base max-w-xl mb-6">
-                {project.description || "Track project progress and manage deliverables across all implementation phases."}
-              </p>
-
-              {/* Status Pills */}
-              <div className="flex flex-wrap gap-2">
-                <span className={cn("inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold", statusColors[project.status])}>
-                  {project.status.replace("_", " ")}
-                </span>
-                {daysLeft !== null && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
-                    <Clock className="w-3 h-3 mr-1.5" />
-                    {daysLeft} Days Left
-                  </span>
-                )}
-              </div>
+            {/* Bottom Action Area */}
+            <div className="flex flex-wrap gap-3 items-center mt-8">
+              <EditProjectDialog
+                project={{
+                  id: project.id,
+                  name: project.name,
+                  description: project.description,
+                  startDate: project.startDate,
+                  dueDate: project.dueDate,
+                }}
+              />
+              <UpdateStatusDialog projectId={project.id} currentStatus={project.status} />
             </div>
           </div>
         </div>
 
-        {/* Sidebar Stats */}
-        <div className="col-span-12 lg:col-span-4 space-y-4 animate-enter delay-300">
-          {/* Status Card */}
+        {/* Sidebar Stats (Right) */}
+        <div className="col-span-12 lg:col-span-4 space-y-6 animate-enter delay-300">
+          {/* Due Date Card */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500">
-                <Layout className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
+                <Calendar className="w-5 h-5" />
               </div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Target Delivery</p>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">{project.status.replace("_", " ")}</h3>
-            <p className="text-sm text-gray-500">Current Phase</p>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              {project.dueDate ? format(new Date(project.dueDate), "MMM d, yyyy") : "TBD"}
+            </h3>
+            {daysLeft !== null && (
+              <p className={cn("text-xs font-semibold", daysLeft < 0 ? "text-rose-500" : "text-emerald-500")}>
+                {daysLeft < 0 ? `${Math.abs(daysLeft)} Days Overdue` : `${daysLeft} Days Remaining`}
+              </p>
+            )}
           </div>
 
           {/* Messages Card */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
+              <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
                 <MessageSquare className="w-5 h-5" />
               </div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Messages</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Team Updates</p>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">{messagesCount}</h3>
-            <p className="text-sm text-gray-500">Total communications</p>
+            <p className="text-sm text-gray-500">Recent communications</p>
           </div>
 
           {/* Integrations Card */}
@@ -184,7 +183,7 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
             <p className="text-sm text-gray-500">Active integrations</p>
           </div>
 
-          {/* Client Info Card */}
+          {/* Client Contact Card */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
@@ -193,25 +192,25 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Client Contact</p>
             </div>
             <h3 className="text-lg font-bold text-gray-900 mb-1">{project.clientContact}</h3>
-            <p className="text-sm text-gray-500">{project.clientEmail}</p>
+            <p className="text-sm text-gray-500 truncate">{project.clientEmail}</p>
           </div>
         </div>
       </div>
 
-      {/* Bottom Section: Phases & Integrations */}
-      <div className="grid grid-cols-12 gap-6 animate-enter delay-400">
-        {/* Phases */}
-        <div className="col-span-12 lg:col-span-7">
+      {/* Main Content - Full Width */}
+      <div className="animate-enter delay-400 space-y-8">
+        {/* Phase Manager */}
+        <section>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Roadmap</h3>
+            <h3 className="text-lg font-bold text-gray-900">Roadmap Progress</h3>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <ProjectPhaseManager projectId={id} isAdmin={true} />
           </div>
-        </div>
+        </section>
 
-        {/* Integrations */}
-        <div className="col-span-12 lg:col-span-5">
+        {/* Connected Systems */}
+        <section>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">Connected Systems</h3>
           </div>
@@ -222,7 +221,7 @@ export default async function AdminProjectDetailPage({ params }: { params: Promi
               integrations={integrations}
             />
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

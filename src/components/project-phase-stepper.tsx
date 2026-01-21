@@ -81,12 +81,12 @@ export function ProjectPhaseStepper({
 
   if (phases.length === 0) {
     return (
-      <div className="p-12 text-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
-        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3 text-gray-400">
+      <div className="p-12 text-center border border-gray-100 rounded-xl bg-white">
+        <div className="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-500">
           <Flag className="w-6 h-6" />
         </div>
-        <h3 className="text-gray-900 font-bold text-base mb-1">No Project Timeline</h3>
-        <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">This project hasn't been set up with a roadmap yet.</p>
+        <h3 className="text-gray-900 font-bold text-base mb-2">Roadmap Coming Soon</h3>
+        <p className="text-gray-500 text-sm max-w-xs mx-auto mb-6">Your project timeline will be set up shortly. You&apos;ll be able to track progress through each phase here.</p>
 
         {isAdmin && (
           <Button size="sm" onClick={onApplyTemplate} className="rounded-xl font-semibold">
@@ -212,12 +212,19 @@ export function ProjectPhaseStepper({
           })}
         </div>
 
-        {/* Time Remaining Pill (Mock based on image 'Left: 5 Months') */}
+        {/* Progress Summary */}
         <div className="flex justify-center mt-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm text-sm font-bold text-gray-500">
-            <Clock className="w-4 h-4 text-emerald-500" />
-            <span>Est. Completion: 2 Months</span>
-          </div>
+          {(() => {
+            const completedCount = phases.filter(p => p.status === 'completed').length;
+            const totalCount = phases.length;
+            const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+            return (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-100 shadow-sm text-sm font-bold text-gray-500">
+                <Clock className="w-4 h-4 text-emerald-500" />
+                <span>{progressPercent}% Complete ({completedCount}/{totalCount} phases)</span>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>

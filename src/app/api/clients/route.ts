@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 import { clients, users, agencies } from "@/lib/db/schema";
 import { eq, isNull } from "drizzle-orm";
+import { notifyNewClient } from "@/lib/notifications";
 
 export async function POST(req: NextRequest) {
   try {
@@ -69,6 +70,23 @@ export async function POST(req: NextRequest) {
         status,
       })
       .returning();
+
+    // Get creator name from Clerk for notification
+    let addedByName = "Admin";
+    try {
+      const clerk = await clerkClient();
+      const clerkUser = await clerk.users.getUser(userId);
+      addedByName = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Admin";
+    } catch {
+      // Keep default name
+    }
+
+    // Create in-app notification for all admins
+    notifyNewClient({
+      clientId: newClient.id,
+      clientName: companyName,
+      addedByName,
+    }).catch((err) => console.error("In-app notification failed:", err));
 
     return NextResponse.json({ client: newClient }, { status: 201 });
   } catch (error) {

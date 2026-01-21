@@ -5,24 +5,11 @@ import { isNull, eq, and, sql, desc, or, count, gte, lte } from "drizzle-orm";
 import {
   Users,
   Ticket,
-  AlertTriangle,
-  FolderKanban,
-  ArrowRight,
-  TrendingUp,
-  TrendingDown,
   Clock,
   Briefcase,
   CheckCircle,
-  Gem,
-  Filter,
-  ArrowUpRight,
   Calendar,
-  ChevronDown,
-  Download,
-  Info,
   Activity,
-  Zap,
-  MoreHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -96,8 +83,16 @@ export default async function AdminDashboard() {
     .groupBy(sql`TO_CHAR(${ticketTimeEntries.loggedAt}, 'Mon')`, sql`EXTRACT(MONTH FROM ${ticketTimeEntries.loggedAt})`)
     .orderBy(sql`EXTRACT(MONTH FROM ${ticketTimeEntries.loggedAt})`);
 
-  // Fill in missing months with 0
-  const monthNames = ['Oct', 'Nov', 'Dec'];
+  // Calculate dynamic month names for last 3 months
+  const getRecentMonths = (count: number = 3): string[] => {
+    const months = [];
+    for (let i = count - 1; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push(date.toLocaleString('default', { month: 'short' }));
+    }
+    return months;
+  };
+  const monthNames = getRecentMonths(3);
   const currentMonth = now.getMonth(); // 0-11
   const monthlyData = monthNames.map((monthName, index) => {
     const targetMonth = currentMonth - 2 + index; // -2, -1, 0 (current)
@@ -182,22 +177,10 @@ export default async function AdminDashboard() {
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Dashboard Overview</h1>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-gray-500 font-medium text-xs cursor-pointer hover:bg-white hover:border-gray-200 transition-all">
+          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-gray-500 font-medium text-xs">
             <Calendar className="w-3.5 h-3.5" />
-            Oct 18 - Nov 18
+            Last 3 Months
           </div>
-          <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-100 rounded-xl text-gray-500 font-medium text-xs cursor-pointer hover:bg-white hover:border-gray-200 transition-all">
-            Monthly
-            <ChevronDown className="w-3.5 h-3.5" />
-          </div>
-          <Button variant="outline" size="sm" className="rounded-xl font-semibold text-gray-600">
-            <Filter className="w-3.5 h-3.5 mr-2" />
-            Filter
-          </Button>
-          <Button size="sm" className="rounded-xl font-semibold bg-gray-900 hover:bg-gray-800">
-            <Download className="w-3.5 h-3.5 mr-2" />
-            Export
-          </Button>
         </div>
       </div>
 
@@ -208,8 +191,6 @@ export default async function AdminDashboard() {
           <StatCard
             label="Total Clients"
             value={clientStats.total.toLocaleString()}
-            trend="15.8%"
-            trendUp={true}
             icon={<Users className="w-4 h-4 text-[#06B6D4]" />}
             variant="cyan"
           />
@@ -218,20 +199,16 @@ export default async function AdminDashboard() {
           <StatCard
             label="Active Projects"
             value={Number(projectStats.active)}
-            trend="4.2%"
-            trendUp={false}
             icon={<Briefcase className="w-4 h-4 text-[#6366F1]" />}
             variant="indigo"
           />
         </div>
         <div className="col-span-12 lg:col-span-4 animate-enter delay-200 stagger-2">
           <StatCard
-            label="Pending Tasks"
+            label="Open Tickets"
             value={Number(ticketStats.open)}
-            trend="24.2%"
-            trendUp={true}
             icon={<CheckCircle className="w-4 h-4 text-emerald-500" />}
-            period="Efficiency rate"
+            period={`${Number(ticketStats.urgent)} urgent`}
             variant="white"
           />
         </div>
@@ -246,10 +223,6 @@ export default async function AdminDashboard() {
                   Work Time Analysis
                 </div>
                 <div className="text-3xl font-bold text-gray-900 tracking-tight">${billableAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-sm font-medium text-gray-400 ml-1">Billable Amount</span></div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" className="rounded-lg h-8 text-[10px] font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900">Filter</Button>
-                <Button variant="ghost" size="sm" className="rounded-lg h-8 text-[10px] font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900">Sort</Button>
               </div>
             </div>
 
@@ -279,10 +252,7 @@ export default async function AdminDashboard() {
             </div>
 
             <div className="flex items-center justify-center gap-6 mt-6 pt-6 border-t border-gray-50">
-              <LegendItem color="bg-indigo-500" label="Development" />
-              <LegendItem color="bg-indigo-400" label="Design" />
-              <LegendItem color="bg-cyan-400" label="Marketing" />
-              <LegendItem color="bg-gray-200" label="Other" />
+              <LegendItem color="bg-indigo-500" label="Billable Hours" />
             </div>
           </Card>
         </div>
@@ -301,20 +271,13 @@ export default async function AdminDashboard() {
                   {percentageChange >= 0 ? '+' : ''}{percentageChange.toFixed(1)}% <span className="text-gray-400">vs last month</span>
                 </div>
               </div>
-              <div className="px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-gray-500 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1 cursor-pointer">
-                Weekly
-                <ChevronDown className="w-3 h-3" />
-              </div>
             </div>
 
-            <div className="h-48 flex items-end justify-between px-2">
-              <SimpleBar label="Sun" h="h-1/2" />
-              <SimpleBar label="Mon" h="h-2/3" />
-              <SimpleBar label="Tue" h="h-[85%]" active />
-              <SimpleBar label="Wed" h="h-1/2" />
-              <SimpleBar label="Thu" h="h-3/4" />
-              <SimpleBar label="Fri" h="h-1/3" />
-              <SimpleBar label="Sat" h="h-2/3" />
+            <div className="flex-1 flex items-center justify-center text-center py-8">
+              <div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">{formatMinutesToHours(thisMonthMinutes)}</div>
+                <p className="text-xs text-gray-500">logged this month</p>
+              </div>
             </div>
           </Card>
         </div>
@@ -326,10 +289,6 @@ export default async function AdminDashboard() {
               <div className="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider">
                 <Users className="w-3.5 h-3.5" />
                 Client Distribution
-              </div>
-              <div className="px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-gray-400 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1 cursor-pointer">
-                Monthly
-                <ChevronDown className="w-3 h-3" />
               </div>
             </div>
             <div className="space-y-6">
@@ -382,43 +341,56 @@ export default async function AdminDashboard() {
                 <thead>
                   <tr className="text-left border-b border-gray-50">
                     <th className="w-10 px-6 py-4"></th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Application</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Type</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Rate</th>
-                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Profit</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ticket</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Priority</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Client</th>
+                    <th className="px-6 py-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">Created</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">
-                  {recentTickets.map((ticket, idx) => (
-                    <tr key={ticket.id} className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
-                      <td className="px-6 py-4">
-                        <div className="custom-checkbox flex items-center">
-                          <input type="checkbox" className="hidden" id={`check-${ticket.id}`} defaultChecked={ticket.status === 'resolved'} />
-                          <div className="w-4 h-4 rounded-md border border-gray-200 bg-white flex items-center justify-center cursor-pointer transition-all">
-                            <CheckCircle className="w-3 h-3 text-white hidden" />
-                          </div>
-                        </div>
+                  {recentTickets.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
+                        No recent tickets
                       </td>
-                      <td className="px-6 py-4 font-semibold text-gray-900">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
-                            <Zap className="w-4 h-4" />
-                          </div>
-                          {ticket.clientName} Update
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-500 font-medium">Finance</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3 w-32">
-                          <div className="h-1.5 flex-1 bg-gray-50 rounded-full overflow-hidden">
-                            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${40 + (idx * 15)}%` }}></div>
-                          </div>
-                          <span className="text-[10px] font-bold text-gray-900">{40 + (idx * 15)}%</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-900 font-bold text-right">$650.00</td>
                     </tr>
-                  ))}
+                  ) : (
+                    recentTickets.map((ticket) => (
+                      <tr key={ticket.id} className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
+                        <td className="px-6 py-4">
+                          <div className={cn(
+                            "w-4 h-4 rounded-full border-2",
+                            ticket.status === 'resolved' || ticket.status === 'closed' ? "bg-emerald-500 border-emerald-500" : "border-gray-300"
+                          )} />
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-gray-900">
+                          <Link href={`/dashboard/admin/tickets/${ticket.id}`} className="flex items-center gap-3 hover:text-indigo-600 transition-colors">
+                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-500">
+                              <Ticket className="w-4 h-4" />
+                            </div>
+                            <span className="truncate max-w-[200px]">{ticket.title}</span>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={cn(
+                            "px-2 py-1 rounded text-[10px] font-bold uppercase",
+                            ticket.priority === 'urgent' ? "bg-red-50 text-red-600" :
+                            ticket.priority === 'high' ? "bg-orange-50 text-orange-600" :
+                            ticket.priority === 'medium' ? "bg-blue-50 text-blue-600" :
+                            "bg-gray-50 text-gray-500"
+                          )}>
+                            {ticket.priority}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-500 text-xs">
+                          {ticket.clientName || 'Unknown'}
+                        </td>
+                        <td className="px-6 py-4 text-gray-500 text-xs text-right">
+                          {formatDistanceToNow(new Date(ticket.createdAt), { addSuffix: true })}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -446,19 +418,6 @@ function WorkBar({ label, segments, valueLabel, active }: any) {
         </div>
       </div>
       <span className={cn("text-xs font-bold uppercase tracking-widest", active ? "text-gray-900" : "text-gray-400")}>{label}</span>
-    </div>
-  );
-}
-
-function SimpleBar({ label, h, active }: any) {
-  return (
-    <div className="flex flex-col items-center gap-3 group/bar h-full justify-end">
-      <div className={cn(
-        "w-8 rounded-full animate-bar transition-all duration-300",
-        active ? "bg-indigo-500 shadow-[0_8px_16px_-4px_rgba(99,102,241,0.4)]" : "bg-gray-100 group-hover/bar:bg-gray-200",
-        h
-      )}></div>
-      <span className={cn("text-[10px] font-bold uppercase tracking-widest", active ? "text-gray-900" : "text-gray-400")}>{label}</span>
     </div>
   );
 }

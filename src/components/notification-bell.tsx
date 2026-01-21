@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell } from "lucide-react";
+import { Bell, MessageSquare, FolderKanban, Ticket, UserPlus, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,6 +19,25 @@ interface Notification {
   linkUrl: string | null;
   isRead: boolean;
   createdAt: string;
+}
+
+// Get icon for notification type
+function getNotificationIcon(type: string) {
+  switch (type) {
+    case "message":
+      return <MessageSquare className="w-4 h-4 text-indigo-500" />;
+    case "project_update":
+      return <FolderKanban className="w-4 h-4 text-emerald-500" />;
+    case "ticket":
+    case "ticket_response":
+      return <Ticket className="w-4 h-4 text-amber-500" />;
+    case "client_added":
+      return <UserPlus className="w-4 h-4 text-cyan-500" />;
+    case "integration_alert":
+      return <AlertCircle className="w-4 h-4 text-red-500" />;
+    default:
+      return <Bell className="w-4 h-4 text-gray-400" />;
+  }
 }
 
 export function NotificationBell() {
@@ -148,21 +167,26 @@ export function NotificationBell() {
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
                   className={`w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors ${
-                    !notification.isRead ? "bg-purple-50" : ""
+                    !notification.isRead ? "bg-purple-50/50" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    {!notification.isRead && (
-                      <div className="w-2 h-2 rounded-full bg-purple-600 mt-2 flex-shrink-0" />
-                    )}
+                    <div className="flex-shrink-0 mt-0.5 p-1.5 rounded-lg bg-gray-100">
+                      {getNotificationIcon(notification.type)}
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-slate-900 mb-1">
-                        {notification.title}
-                      </p>
-                      <p className="text-sm text-slate-600 mb-2 line-clamp-2">
+                      <div className="flex items-center gap-2">
+                        <p className={`text-sm ${!notification.isRead ? "font-semibold text-slate-900" : "font-medium text-slate-700"}`}>
+                          {notification.title}
+                        </p>
+                        {!notification.isRead && (
+                          <div className="w-2 h-2 rounded-full bg-purple-600 flex-shrink-0" />
+                        )}
+                      </div>
+                      <p className="text-sm text-slate-500 mt-0.5 line-clamp-2">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-400 mt-1">
                         {formatDistanceToNow(new Date(notification.createdAt), {
                           addSuffix: true,
                         })}

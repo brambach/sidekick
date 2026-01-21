@@ -7,15 +7,10 @@ import {
   FolderKanban,
   Clock,
   CheckCircle,
-  Pause,
   FileSearch,
-  ArrowUpRight,
   Calendar,
-  Layers,
   MoreHorizontal,
   Plus,
-  ArrowRight,
-  TrendingUp,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import dynamicImport from "next/dynamic";
@@ -85,9 +80,6 @@ export default async function ProjectsPage() {
           <p className="text-sm text-gray-500 mt-1">Status board for all client delivery across segments.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="rounded-xl font-semibold text-gray-500 border-gray-100">
-            Timeline View
-          </Button>
           <AddProjectDialog clients={allClients} />
         </div>
       </div>
@@ -175,12 +167,6 @@ function ProjectCard({ project, index }: any) {
             )}>
               {project.dueDate ? formatDistanceToNow(new Date(project.dueDate), { addSuffix: true }) : "No Date"}
             </span>
-          </div>
-          <div className="flex items-center gap-1.5 ml-auto">
-            <div className="flex -space-x-2">
-              <div className="w-5 h-5 rounded-full border border-white bg-indigo-100 flex items-center justify-center text-[7px] font-bold text-indigo-600">BR</div>
-              <div className="w-5 h-5 rounded-full border border-white bg-gray-100 flex items-center justify-center text-[7px] font-bold text-gray-400">+2</div>
-            </div>
           </div>
         </div>
       </div>

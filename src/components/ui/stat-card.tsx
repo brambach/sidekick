@@ -3,11 +3,11 @@ import { cn } from "@/lib/utils";
 import { TrendingUp, TrendingDown, Users } from "lucide-react";
 import React from "react";
 
-interface StatCardProps {
+export interface StatCardProps {
     label: string;
     value: string | number;
-    trend: string;
-    trendUp: boolean;
+    trend?: string;
+    trendUp?: boolean;
     icon?: React.ReactNode;
     period?: string;
     variant?: "cyan" | "indigo" | "white" | "emerald";
@@ -47,15 +47,19 @@ export function StatCard({ label, value, trend, trendUp, icon, period = "vs last
 
             <div className="z-10 relative">
                 <div className="text-3xl font-bold tracking-tight text-gray-900 mb-2">{value}</div>
-                <div className="flex items-center gap-2">
-                    <span className={cn(
-                        "text-[10px] font-semibold px-1.5 py-0.5 rounded border flex items-center gap-1",
-                        trendUp ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
-                    )}>
-                        {trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />} {trend}
-                    </span>
-                    <span className="text-xs text-gray-400 font-medium group-hover:text-gray-500 transition-colors">{period}</span>
-                </div>
+                {(trend || period) && (
+                    <div className="flex items-center gap-2">
+                        {trend && (
+                            <span className={cn(
+                                "text-[10px] font-semibold px-1.5 py-0.5 rounded border flex items-center gap-1",
+                                trendUp ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
+                            )}>
+                                {trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />} {trend}
+                            </span>
+                        )}
+                        {period && <span className="text-xs text-gray-400 font-medium group-hover:text-gray-500 transition-colors">{period}</span>}
+                    </div>
+                )}
             </div>
 
             {/* Decorative Gradient Blob */}

@@ -5,15 +5,7 @@ import { eq, isNull, and, count, desc, sql } from "drizzle-orm";
 import Link from "next/link";
 import {
   Users,
-  Building2,
-  Mail,
-  FolderKanban,
-  UserCircle,
-  ArrowUpRight,
-  Plus,
   Search,
-  MoreHorizontal,
-  ChevronDown
 } from "lucide-react";
 import dynamicImport from "next/dynamic";
 import { ClientStatusMenu } from "@/components/client-status-menu";
@@ -137,24 +129,13 @@ export default async function ClientsPage() {
       <div className="animate-enter delay-200">
         <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
           <div className="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            {/* Changed from bg-gray-50/50 to bg-white for cleaner look */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest border-b-2 border-indigo-600 pb-4 mt-4 h-full cursor-pointer">
-                All Clients
-              </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest pb-4 mt-4 hover:text-gray-600 cursor-pointer transition-colors">
-                Internal Teams
-              </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
+              All Clients
+              <span className="bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full">{clientData.length}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="relative group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
-                <input type="text" placeholder="Search clients..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-transparent rounded-lg text-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-200 w-64 transition-all" />
-              </div>
-              <Button variant="outline" size="sm" className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-500 border-gray-200 hover:bg-gray-50">
-                <ChevronDown className="w-3.5 h-3.5 mr-1" />
-                Filter
-              </Button>
+            <div className="relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+              <input type="text" placeholder="Search clients..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-transparent rounded-lg text-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-200 w-64 transition-all" />
             </div>
           </div>
           <table className="w-full">

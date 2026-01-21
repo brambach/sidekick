@@ -403,22 +403,22 @@ async function seed() {
     const ticketStatuses = ["open", "in_progress", "waiting_on_client", "resolved", "closed"] as const;
 
     const ticketsData = [
-      { clientId: insertedClients[0].id, projectId: insertedProjects[0].id, title: "API timeout in payroll sync", description: "Intermittent timeouts when syncing payroll data to NetSuite during peak hours", type: "bug_report", priority: "high", status: "in_progress", createdAt: daysAgo(5) },
-      { clientId: insertedClients[0].id, projectId: insertedProjects[1].id, title: "Employee import CSV error", description: "Getting validation errors when importing employees via CSV", type: "bug_report", priority: "medium", status: "resolved", createdAt: daysAgo(12) },
-      { clientId: insertedClients[0].id, projectId: null, title: "Request for custom reports", description: "Need custom reports for headcount by department", type: "feature_request", priority: "low", status: "open", createdAt: daysAgo(2) },
+      { clientId: insertedClients[0].id, projectId: insertedProjects[0].id, title: "API timeout in payroll sync", description: "Intermittent timeouts when syncing payroll data to NetSuite during peak hours", type: "bug_report" as const, priority: "high" as const, status: "in_progress" as const, createdAt: daysAgo(5) },
+      { clientId: insertedClients[0].id, projectId: insertedProjects[1].id, title: "Employee import CSV error", description: "Getting validation errors when importing employees via CSV", type: "bug_report" as const, priority: "medium" as const, status: "resolved" as const, createdAt: daysAgo(12) },
+      { clientId: insertedClients[0].id, projectId: null, title: "Request for custom reports", description: "Need custom reports for headcount by department", type: "feature_request" as const, priority: "low" as const, status: "open" as const, createdAt: daysAgo(2) },
 
-      { clientId: insertedClients[1].id, projectId: insertedProjects[2].id, title: "Time tracking mobile app issue", description: "Employees can't clock in via mobile app", type: "bug_report", priority: "urgent", status: "in_progress", createdAt: daysAgo(1) },
-      { clientId: insertedClients[1].id, projectId: insertedProjects[3].id, title: "Recipe performance degradation", description: "Workato recipes running slower than expected", type: "project_issue", priority: "medium", status: "closed", createdAt: daysAgo(45) },
-      { clientId: insertedClients[1].id, projectId: null, title: "Training session request", description: "Need training for new HR staff on HiBob", type: "general_support", priority: "low", status: "waiting_on_client", createdAt: daysAgo(8) },
+      { clientId: insertedClients[1].id, projectId: insertedProjects[2].id, title: "Time tracking mobile app issue", description: "Employees can't clock in via mobile app", type: "bug_report" as const, priority: "urgent" as const, status: "in_progress" as const, createdAt: daysAgo(1) },
+      { clientId: insertedClients[1].id, projectId: insertedProjects[3].id, title: "Recipe performance degradation", description: "Workato recipes running slower than expected", type: "project_issue" as const, priority: "medium" as const, status: "closed" as const, createdAt: daysAgo(45) },
+      { clientId: insertedClients[1].id, projectId: null, title: "Training session request", description: "Need training for new HR staff on HiBob", type: "general_support" as const, priority: "low" as const, status: "waiting_on_client" as const, createdAt: daysAgo(8) },
 
-      { clientId: insertedClients[2].id, projectId: insertedProjects[4].id, title: "Onboarding workflow not triggering", description: "New hire onboarding automation stopped working", type: "bug_report", priority: "high", status: "resolved", createdAt: daysAgo(15) },
-      { clientId: insertedClients[2].id, projectId: null, title: "Question about permissions", description: "How to set up department-specific permissions?", type: "general_support", priority: "low", status: "closed", createdAt: daysAgo(20) },
+      { clientId: insertedClients[2].id, projectId: insertedProjects[4].id, title: "Onboarding workflow not triggering", description: "New hire onboarding automation stopped working", type: "bug_report" as const, priority: "high" as const, status: "resolved" as const, createdAt: daysAgo(15) },
+      { clientId: insertedClients[2].id, projectId: null, title: "Question about permissions", description: "How to set up department-specific permissions?", type: "general_support" as const, priority: "low" as const, status: "closed" as const, createdAt: daysAgo(20) },
 
-      { clientId: insertedClients[3].id, projectId: insertedProjects[6].id, title: "Compliance report formatting", description: "Need to adjust formatting on quarterly compliance reports", type: "project_issue", priority: "medium", status: "in_progress", createdAt: daysAgo(7) },
-      { clientId: insertedClients[3].id, projectId: insertedProjects[7].id, title: "ADP integration complete", description: "Confirming successful completion of ADP integration", type: "general_support", priority: "low", status: "closed", createdAt: daysAgo(30) },
-      { clientId: insertedClients[3].id, projectId: null, title: "Add new country payroll", description: "Need to add Germany to multi-country payroll setup", type: "feature_request", priority: "medium", status: "open", createdAt: daysAgo(3) },
+      { clientId: insertedClients[3].id, projectId: insertedProjects[6].id, title: "Compliance report formatting", description: "Need to adjust formatting on quarterly compliance reports", type: "project_issue" as const, priority: "medium" as const, status: "in_progress" as const, createdAt: daysAgo(7) },
+      { clientId: insertedClients[3].id, projectId: insertedProjects[7].id, title: "ADP integration complete", description: "Confirming successful completion of ADP integration", type: "general_support" as const, priority: "low" as const, status: "closed" as const, createdAt: daysAgo(30) },
+      { clientId: insertedClients[3].id, projectId: null, title: "Add new country payroll", description: "Need to add Germany to multi-country payroll setup", type: "feature_request" as const, priority: "medium" as const, status: "open" as const, createdAt: daysAgo(3) },
 
-      { clientId: insertedClients[4].id, projectId: insertedProjects[9].id, title: "Shift scheduling requirements", description: "Discussion of requirements for shift scheduling", type: "project_issue", priority: "medium", status: "waiting_on_client", createdAt: daysAgo(4) },
+      { clientId: insertedClients[4].id, projectId: insertedProjects[9].id, title: "Shift scheduling requirements", description: "Discussion of requirements for shift scheduling", type: "project_issue" as const, priority: "medium" as const, status: "waiting_on_client" as const, createdAt: daysAgo(4) },
     ];
 
     const insertedTickets = await db.insert(tickets).values(

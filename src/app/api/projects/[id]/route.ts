@@ -5,6 +5,7 @@ import { projects, users, clients } from "@/lib/db/schema";
 import { eq, and, isNull } from "drizzle-orm";
 import { notifyStatusChanged } from "@/lib/slack";
 import { sendStatusUpdateEmail } from "@/lib/email";
+import { notifyProjectStatusChange } from "@/lib/notifications";
 
 export async function PUT(
   req: NextRequest,
@@ -99,6 +100,15 @@ export async function PUT(
           newStatus: status,
         }).catch((err) => console.error("Email notification failed:", err));
       }
+
+      // In-app notification to client users
+      notifyProjectStatusChange({
+        projectId: id,
+        projectName: name || existingProject.name,
+        clientId: existingProject.clientId,
+        oldStatus,
+        newStatus: status,
+      }).catch((err) => console.error("In-app notification failed:", err));
     }
 
     return NextResponse.json(updatedProject[0], { status: 200 });

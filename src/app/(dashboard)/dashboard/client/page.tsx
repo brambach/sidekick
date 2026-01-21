@@ -67,11 +67,19 @@ export default async function ClientDashboard() {
   // Project velocity: Calculate % of completed phases per month
   const projectIds = clientProjects.map(p => p.id);
 
-  let activityData = [
-    { label: "OCT", value: 30 },
-    { label: "NOV", value: 45 },
-    { label: "DEC", value: 75 },
-  ];
+  // Calculate dynamic month names for last 3 months
+  const getRecentMonths = (count: number = 3): string[] => {
+    const months = [];
+    for (let i = count - 1; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push(date.toLocaleString('default', { month: 'short' }).toUpperCase());
+    }
+    return months;
+  };
+  const monthNames = getRecentMonths(3);
+  const currentMonth = now.getMonth();
+
+  let activityData: { label: string; value: number }[] = [];
 
   if (projectIds.length > 0) {
     const phaseCompletion = await db
@@ -90,10 +98,6 @@ export default async function ClientDashboard() {
       )
       .groupBy(sql`TO_CHAR(${projectPhases.completedAt}, 'Mon')`, sql`EXTRACT(MONTH FROM ${projectPhases.completedAt})`);
 
-    // Fill in months with real data or defaults
-    const monthNames = ['OCT', 'NOV', 'DEC'];
-    const currentMonth = now.getMonth();
-
     activityData = monthNames.map((monthName, index) => {
       const targetMonth = currentMonth - 2 + index;
       const normalizedMonth = ((targetMonth % 12) + 12) % 12 + 1;
@@ -101,7 +105,7 @@ export default async function ClientDashboard() {
       const existing = phaseCompletion.find(m => Number(m.monthNum) === normalizedMonth);
       const percentage = existing && Number(existing.total) > 0
         ? Math.round((Number(existing.completed) / Number(existing.total)) * 100)
-        : Math.max(30, index * 20); // Default fallback pattern
+        : 0;
 
       return {
         label: monthName,
@@ -152,18 +156,6 @@ export default async function ClientDashboard() {
     .orderBy(desc(tickets.createdAt))
     .limit(2);
 
-  const unreadMessagesCount = await db
-    .select({ count: count() })
-    .from(messages)
-    .where(
-      and(
-        projectIds.length > 0 ? inArray(messages.projectId, projectIds) : sql`false`,
-        eq(messages.read, false),
-        isNull(messages.deletedAt)
-      )
-    )
-    .then(r => r[0]?.count || 0);
-
   return (
     <div className="flex-1 overflow-y-auto bg-[#F9FAFB] p-8 space-y-8 no-scrollbar relative font-geist">
       <AnimateOnScroll />
@@ -189,24 +181,18 @@ export default async function ClientDashboard() {
         <StatCard
           label="Active Projects"
           value={activeProjectsCount.toString()}
-          trend="12.5%"
-          trendUp={true}
           icon={<FolderOpen className="w-4 h-4 text-[#06B6D4]" />}
           variant="cyan"
         />
         <StatCard
           label="Pending Tickets"
           value={openTicketsCount.toString()}
-          trend="Low Volume"
-          trendUp={true} // Green because low volume is good? or false? text is gray usually
           icon={<MessageSquare className="w-4 h-4 text-[#6366F1]" />}
           variant="indigo"
         />
         <StatCard
-          label="System Health"
+          label="Integrations"
           value={`${integrationsCount} Active`}
-          trend="100% Uptime"
-          trendUp={true}
           icon={<Activity className="w-4 h-4 text-emerald-500" />}
           variant="emerald"
         />
@@ -221,16 +207,13 @@ export default async function ClientDashboard() {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Activity className="w-4 h-4 text-gray-400" />
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Project Velocity</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Project Progress</span>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">On Track</h2>
-              </div>
-              <div className="bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded-md">
-                Q4 2025
+                <h2 className="text-3xl font-bold text-gray-900 tracking-tight">{activeProjectsCount} Active</h2>
               </div>
             </div>
 
-            {/* Mock Chart Bars */}
+            {/* Progress Chart */}
             <div className="flex items-end justify-around h-[200px] px-8 pb-4 relative">
               {/* Dotted lines background */}
               <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
@@ -240,19 +223,23 @@ export default async function ClientDashboard() {
                 <div className="w-full border-t border-dashed border-gray-400"></div>
               </div>
 
-              {activityData.map((d, i) => (
+              {activityData.length > 0 ? activityData.map((d, i) => (
                 <div key={i} className="flex flex-col items-center gap-4 relative z-10 w-12 group">
                   <div className="w-full bg-[#E0E7FF] rounded-full relative overflow-hidden flex items-end opacity-50 hover:opacity-100 transition-opacity" style={{ height: '180px' }}>
                     <div className="w-full bg-[#6366F1] rounded-t-full transition-all duration-1000" style={{ height: `${d.value}%` }}></div>
                   </div>
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{d.label}</span>
-                  {i === 2 && (
-                    <div className="absolute -top-10 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg animate-bounce">
+                  {i === activityData.length - 1 && (
+                    <div className="absolute -top-10 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg">
                       Now
                     </div>
                   )}
                 </div>
-              ))}
+              )) : (
+                <div className="flex items-center justify-center w-full h-full text-gray-400 text-sm">
+                  No phase data available
+                </div>
+              )}
             </div>
           </Card>
 
@@ -362,7 +349,7 @@ export default async function ClientDashboard() {
               <div>
                 <p className="text-sm font-bold">Action Required</p>
                 <p className="text-[10px] text-gray-400 uppercase tracking-widest">
-                  {pendingTickets.length + Number(unreadMessagesCount)} Pending Items
+                  {pendingTickets.length} {pendingTickets.length === 1 ? 'Ticket' : 'Tickets'} Pending
                 </p>
               </div>
             </div>
@@ -378,7 +365,8 @@ export default async function ClientDashboard() {
                 </Link>
               )) : (
                 <div className="bg-white/5 p-4 rounded-2xl border border-white/10 text-center">
-                  <p className="text-xs text-gray-400">No pending items</p>
+                  <CheckCircle className="w-5 h-5 text-emerald-400 mx-auto mb-2" />
+                  <p className="text-xs text-gray-400">All caught up!</p>
                 </div>
               )}
             </div>

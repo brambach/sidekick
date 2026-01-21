@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { messages, users, projects, clients } from "@/lib/db/schema";
 import { eq, and, isNull, desc, sql } from "drizzle-orm";
 import { notifyMessageReceived } from "@/lib/slack";
+import { notifyNewMessage } from "@/lib/notifications";
 
 export async function GET(req: NextRequest) {
   try {
@@ -176,37 +177,37 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    // Send Slack notification for client messages only
-    if (user.role === "client") {
-      // Get project and client info
-      const project = await db
-        .select({
-          name: projects.name,
-          clientId: projects.clientId,
-        })
-        .from(projects)
-        .where(eq(projects.id, projectId))
+    // Get project and client info for notifications
+    const project = await db
+      .select({
+        name: projects.name,
+        clientId: projects.clientId,
+      })
+      .from(projects)
+      .where(eq(projects.id, projectId))
+      .limit(1)
+      .then((rows) => rows[0]);
+
+    if (project) {
+      const client = await db
+        .select({ companyName: clients.companyName })
+        .from(clients)
+        .where(eq(clients.id, project.clientId))
         .limit(1)
         .then((rows) => rows[0]);
 
-      if (project) {
-        const client = await db
-          .select({ companyName: clients.companyName })
-          .from(clients)
-          .where(eq(clients.id, project.clientId))
-          .limit(1)
-          .then((rows) => rows[0]);
+      // Get sender name from Clerk
+      let senderName = user.role === "client" ? "Client" : "Digital Directions";
+      try {
+        const clerk = await clerkClient();
+        const clerkUser = await clerk.users.getUser(userId);
+        senderName = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || senderName;
+      } catch {
+        // Keep default name
+      }
 
-        // Get sender name from Clerk
-        let senderName = "Client";
-        try {
-          const clerk = await clerkClient();
-          const clerkUser = await clerk.users.getUser(userId);
-          senderName = `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim() || "Client";
-        } catch {
-          // Keep default name
-        }
-
+      // Send Slack notification for client messages only
+      if (user.role === "client") {
         notifyMessageReceived({
           senderName,
           clientName: client?.companyName || "Unknown Client",
@@ -215,6 +216,16 @@ export async function POST(req: NextRequest) {
           messagePreview: content,
         }).catch((err) => console.error("Slack notification failed:", err));
       }
+
+      // Create in-app notification for recipients
+      notifyNewMessage({
+        senderRole: user.role as "admin" | "client",
+        senderName,
+        projectId,
+        projectName: project.name,
+        clientId: project.clientId,
+        messagePreview: content,
+      }).catch((err) => console.error("In-app notification failed:", err));
     }
 
     return NextResponse.json(newMessage[0], { status: 201 });

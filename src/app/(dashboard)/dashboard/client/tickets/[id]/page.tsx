@@ -96,7 +96,7 @@ export default async function ClientTicketDetailPage({ params }: { params: Promi
     return {
       name: clerkU ? `${clerkU.firstName} ${clerkU.lastName}`.trim() : "User",
       avatar: clerkU?.imageUrl || null,
-      isStaff: dbU.role === 'admin' || dbU.role === 'super_admin'
+      isStaff: dbU.role === 'admin'
     };
   }
 
