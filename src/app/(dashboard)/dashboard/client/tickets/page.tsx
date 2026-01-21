@@ -4,7 +4,7 @@ import { tickets, projects, users, clients } from "@/lib/db/schema";
 import { eq, isNull, and, desc, or } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
 import dynamicImport from "next/dynamic";
-import { Ticket, Filter, MessageSquare, ShieldAlert, CheckCircle, Plus, Zap, Clock } from "lucide-react";
+import { MessageSquare, ShieldAlert, CheckCircle, Zap, Clock } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -89,20 +89,116 @@ export default async function ClientTicketsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-enter delay-100">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Support Requests</h1>
-          <p className="text-sm text-gray-500 mt-1">Track the status of your inquiries and issues.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Help Center</h1>
+          <p className="text-sm text-gray-500 mt-1">Find answers to common questions or submit a support request.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="rounded-xl font-semibold text-gray-500 border-gray-100 bg-white">
-            <Filter className="w-3.5 h-3.5 mr-2" />
-            Filter
-          </Button>
           <CreateTicketDialog clients={clientList} projects={clientProjects} />
         </div>
       </div>
 
+      {/* FAQ Section */}
+      <div className="animate-enter delay-200">
+        <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden bg-white">
+          <div className="p-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {/* FAQ Item 1 */}
+              <details className="group border-b border-gray-100 pb-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    How do I track my project progress?
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  Visit the Projects page from the sidebar to see all your active projects. Each project has a detailed page showing the roadmap progress, current phase, and system health. You'll receive automatic updates as your project moves through each phase.
+                </p>
+              </details>
+
+              {/* FAQ Item 2 */}
+              <details className="group border-b border-gray-100 pb-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    How do I access project files and documents?
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  All project files are available on your project detail page. Click on any project, then scroll to the Files section. You can download files directly or view them in your browser. Files are organized by upload date with the most recent at the top.
+                </p>
+              </details>
+
+              {/* FAQ Item 3 */}
+              <details className="group border-b border-gray-100 pb-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    What's the best way to communicate with my team?
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  Use the Project Chat feature on each project page for quick questions and updates. For more complex issues or formal requests, submit a support ticket here in the Help Center. All communication is tracked and visible in your portal history.
+                </p>
+              </details>
+
+              {/* FAQ Item 4 */}
+              <details className="group border-b border-gray-100 pb-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    How long does it take to get a response to my ticket?
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  Most support tickets receive an initial response within 4 business hours. Urgent issues are prioritized and typically addressed within 1-2 hours. You'll receive email notifications when your ticket status changes or when our team adds a comment.
+                </p>
+              </details>
+
+              {/* FAQ Item 5 */}
+              <details className="group border-b border-gray-100 pb-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    Can I invite additional team members to the portal?
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  Yes! Contact your Digital Directions consultant or submit a support ticket with the email addresses of team members you'd like to invite. They'll receive an invitation email with instructions to create their account and access your projects.
+                </p>
+              </details>
+
+              {/* FAQ Item 6 */}
+              <details className="group pb-4">
+                <summary className="flex items-center justify-between cursor-pointer list-none">
+                  <span className="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    What should I do if I notice an integration issue?
+                  </span>
+                  <svg className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                  Integration health is monitored automatically every 5 minutes. If you notice an issue before we do, please submit an urgent support ticket with details about what you're experiencing. Include any error messages or screenshots to help us resolve it quickly.
+                </p>
+              </details>
+            </div>
+          </div>
+        </Card>
+      </div>
+
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-enter delay-200">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-enter delay-300">
         <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between group hover:border-indigo-100 transition-all">
           <div>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Open Tickets</p>
@@ -133,7 +229,7 @@ export default async function ClientTicketsPage() {
       </div>
 
       {/* Active Requests Section */}
-      <div className="animate-enter delay-300 space-y-4">
+      <div className="animate-enter delay-400 space-y-4">
         <div className="flex items-center gap-2 px-1">
           <Zap className="w-4 h-4 text-indigo-500" />
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest">Active Queue</h2>
@@ -207,7 +303,7 @@ export default async function ClientTicketsPage() {
 
       {/* History Section */}
       {resolvedTickets.length > 0 && (
-        <div className="animate-enter delay-400 space-y-4">
+        <div className="animate-enter delay-500 space-y-4">
           <div className="flex items-center gap-2 px-1">
             <Clock className="w-4 h-4 text-gray-400" />
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Resident History</h2>

@@ -13,7 +13,8 @@ import {
   Layout,
   CheckCircle,
   AlertCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  HelpCircle
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { cn, formatMinutesToHours } from "@/lib/utils";
@@ -174,14 +175,10 @@ export default async function ClientDashboard() {
           <p className="text-sm text-gray-500 mt-1">Welcome back, {client.contactName.split(' ')[0]}</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="rounded-xl font-semibold text-gray-500">
-            <Clock className="w-3.5 h-3.5 mr-2" />
-            Last 30 Days
-          </Button>
-          <Link href="/dashboard/client/tickets/new">
+          <Link href="/dashboard/client/tickets">
             <Button size="sm" className="rounded-xl font-semibold shadow-sm">
-              <Layout className="w-3.5 h-3.5 mr-2" />
-              New Request
+              <HelpCircle className="w-3.5 h-3.5 mr-2" />
+              Get Support
             </Button>
           </Link>
         </div>
