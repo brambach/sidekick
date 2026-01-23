@@ -323,7 +323,7 @@ export default async function ClientTicketsPage() {
         <div className="animate-enter delay-500 space-y-4">
           <div className="flex items-center gap-2 px-1">
             <Clock className="w-4 h-4 text-gray-400" />
-            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Resident History</h2>
+            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Resolved History</h2>
           </div>
           <Card className="rounded-xl border-gray-100 shadow-sm overflow-hidden bg-gray-50/30">
             <div className="overflow-x-auto">

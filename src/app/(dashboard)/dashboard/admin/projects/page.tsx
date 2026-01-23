@@ -10,7 +10,6 @@ import {
   FileSearch,
   Calendar,
   MoreHorizontal,
-  Plus,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import dynamicImport from "next/dynamic";
@@ -99,16 +98,10 @@ export default async function ProjectsPage() {
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em]">{column.title}</span>
                 <span className="bg-gray-50 text-gray-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-gray-100">{column.projects.length}</span>
               </div>
-              <button className="text-gray-300 hover:text-gray-600 transition-colors">
+              <button className="text-gray-300 hover:text-gray-600 transition-colors" aria-label="Column options">
                 <MoreHorizontal className="w-4 h-4" />
               </button>
             </div>
-
-            {/* Column Actions */}
-            <button className="w-full py-2 mb-4 bg-gray-50/50 border border-dashed border-gray-200 rounded-xl text-gray-400 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-gray-50 hover:border-gray-300 transition-all group">
-              <Plus className="w-3 h-3 group-hover:scale-125 transition-transform" />
-              Add New Project
-            </button>
 
             {/* Cards List */}
             <div className="space-y-4">
@@ -129,7 +122,19 @@ export default async function ProjectsPage() {
   );
 }
 
-function ProjectCard({ project, index }: any) {
+interface ProjectCardProps {
+  project: {
+    id: string;
+    name: string;
+    description: string | null;
+    status: string;
+    dueDate: Date | null;
+    clientName: string | null;
+  };
+  index: number;
+}
+
+function ProjectCard({ project, index }: ProjectCardProps) {
   const isOverdue = project.dueDate && new Date(project.dueDate) < new Date() && project.status !== 'completed';
 
   return (

@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { IntegrationHealthCard } from "./integration-health-card";
 import { Activity } from "lucide-react";
 
+interface Integration {
+  id: string;
+  serviceName: string;
+  serviceType: string;
+  currentStatus: "healthy" | "degraded" | "down" | "unknown";
+  lastCheckedAt: string | null;
+  lastErrorMessage: string | null;
+  platformIncidents: string | null;
+}
+
 interface IntegrationHealthGridProps {
   clientId?: string;
   projectId?: string;
@@ -13,7 +23,7 @@ export function IntegrationHealthGrid({
   clientId,
   projectId,
 }: IntegrationHealthGridProps) {
-  const [integrations, setIntegrations] = useState<any[]>([]);
+  const [integrations, setIntegrations] = useState<Integration[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

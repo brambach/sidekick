@@ -3,10 +3,7 @@ import { db } from "@/lib/db";
 import { clients, projects, users } from "@/lib/db/schema";
 import { eq, isNull, and, count, desc, sql } from "drizzle-orm";
 import Link from "next/link";
-import {
-  Users,
-  Search,
-} from "lucide-react";
+import { Users } from "lucide-react";
 import dynamicImport from "next/dynamic";
 import { ClientStatusMenu } from "@/components/client-status-menu";
 import { formatDistanceToNow } from "date-fns";
@@ -28,7 +25,7 @@ export const dynamic = "force-dynamic";
 
 // Status badge component
 function StatusBadge({ status }: { status: string }) {
-  const variants: any = {
+  const variants: Record<string, string> = {
     active: 'bg-emerald-50 text-emerald-600 border-emerald-100',
     inactive: 'bg-gray-50 text-gray-500 border-gray-100',
     archived: 'bg-amber-50 text-amber-600 border-amber-100',
@@ -128,14 +125,10 @@ export default async function ClientsPage() {
       {/* Directory Table */}
       <div className="animate-enter delay-200">
         <div className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
-          <div className="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="bg-white px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2 text-[10px] font-bold text-indigo-600 uppercase tracking-widest">
               All Clients
               <span className="bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full">{clientData.length}</span>
-            </div>
-            <div className="relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input type="text" placeholder="Search clients..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-transparent rounded-lg text-xs focus:bg-white focus:outline-none focus:ring-1 focus:ring-gray-200 focus:border-gray-200 w-64 transition-all" />
             </div>
           </div>
           <table className="w-full">

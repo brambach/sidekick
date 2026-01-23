@@ -229,21 +229,19 @@ export default async function AdminDashboard() {
             <div className="flex-1 flex items-end justify-between px-4 pb-4">
               {monthlyData.map((month, index) => {
                 const maxHours = Math.max(...monthlyData.map(m => m.value), 1);
-                const heightPercentage = (month.value / maxHours) * 100;
-                const heightClass = `h-[${Math.max(heightPercentage, 10)}%]`;
+                const heightPercentage = Math.max((month.value / maxHours) * 100, 10);
 
-                const segments = [
-                  { color: index === 0 ? 'bg-indigo-300' : index === 1 ? 'bg-cyan-300' : 'bg-indigo-400', h: 'h-1/3' },
-                  { color: index === 0 ? 'bg-indigo-400' : index === 1 ? 'bg-cyan-400' : 'bg-indigo-500', h: 'h-1/3' },
-                  { color: index === 0 ? 'bg-indigo-200' : index === 1 ? 'bg-cyan-200' : 'bg-indigo-300', h: 'h-1/3' },
-                ];
+                const colors = index === 0 ? ['bg-indigo-300', 'bg-indigo-400', 'bg-indigo-200'] :
+                               index === 1 ? ['bg-cyan-300', 'bg-cyan-400', 'bg-cyan-200'] :
+                               ['bg-indigo-400', 'bg-indigo-500', 'bg-indigo-300'];
 
                 return (
                   <WorkBar
                     key={month.label}
                     label={month.label}
                     value={month.value}
-                    segments={segments}
+                    colors={colors}
+                    heightPercent={heightPercentage}
                     active={month.isActive}
                     valueLabel={month.isActive ? `$${month.amount.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : undefined}
                   />
@@ -401,7 +399,16 @@ export default async function AdminDashboard() {
   );
 }
 
-function WorkBar({ label, segments, valueLabel, active }: any) {
+interface WorkBarProps {
+  label: string;
+  value: number;
+  colors: string[];
+  heightPercent: number;
+  active: boolean;
+  valueLabel?: string;
+}
+
+function WorkBar({ label, colors, heightPercent, valueLabel, active }: WorkBarProps) {
   return (
     <div className="flex flex-col items-center gap-4 group/bar">
       <div className="relative h-64 w-12 flex flex-col-reverse items-center">
@@ -412,9 +419,14 @@ function WorkBar({ label, segments, valueLabel, active }: any) {
           </div>
         )}
         <div className="w-8 h-full bg-gray-50/50 rounded-full border border-gray-50 flex flex-col-reverse overflow-hidden group-hover/bar:border-gray-100 transition-colors">
-          {segments.map((s: any, idx: number) => (
-            <div key={idx} className={cn(s.color, s.h, "w-full animate-bar")} style={{ animationDelay: `${idx * 0.1}s` }}></div>
-          ))}
+          <div
+            className="w-full flex flex-col-reverse transition-all duration-500"
+            style={{ height: `${heightPercent}%` }}
+          >
+            {colors.map((color, idx) => (
+              <div key={idx} className={cn(color, "w-full flex-1 animate-bar")} style={{ animationDelay: `${idx * 0.1}s` }}></div>
+            ))}
+          </div>
         </div>
       </div>
       <span className={cn("text-xs font-bold uppercase tracking-widest", active ? "text-gray-900" : "text-gray-400")}>{label}</span>
@@ -422,7 +434,12 @@ function WorkBar({ label, segments, valueLabel, active }: any) {
   );
 }
 
-function LegendItem({ color, label }: any) {
+interface LegendItemProps {
+  color: string;
+  label: string;
+}
+
+function LegendItem({ color, label }: LegendItemProps) {
   return (
     <div className="flex items-center gap-2">
       <div className={cn("w-2 h-2 rounded-full", color)}></div>

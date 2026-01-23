@@ -164,7 +164,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const activeProjectsTrend = "12%";
 
   // Custom Work Item Component for timeline look
-  const ActivityItem = ({ icon: Icon, color, title, time }: any) => (
+  const ActivityItem = ({ color, title, time }: { color: string; title: string; time: string }) => (
     <div className="relative pl-6 pb-6 border-l border-gray-100 last:border-l-0 last:pb-0">
       <div className={cn("absolute -left-1.5 top-0 w-3 h-3 rounded-full ring-4 ring-white", color)}></div>
       <div className="flex flex-col">
@@ -326,7 +326,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                           </td>
                           <td className="px-6 py-5 pr-8 text-right">
                             <Link href={`/dashboard/admin/projects/${project.id}`}>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg" aria-label="Project options">
                                 <MoreHorizontal className="w-4 h-4 text-gray-400" />
                               </Button>
                             </Link>

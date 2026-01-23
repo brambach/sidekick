@@ -178,9 +178,9 @@ export function AdminMessagesInterface({ projects, currentUserId }: { projects: 
                                 </div>
                             </div>
                             <div className="flex items-center gap-4 text-gray-400">
-                                <button className="p-2 hover:bg-gray-50 rounded-full transition-colors"><Phone className="w-5 h-5" /></button>
-                                <button className="p-2 hover:bg-gray-50 rounded-full transition-colors"><Video className="w-5 h-5" /></button>
-                                <button className="p-2 hover:bg-gray-50 rounded-full transition-colors"><MoreHorizontal className="w-5 h-5" /></button>
+                                <button className="p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Start voice call"><Phone className="w-5 h-5" /></button>
+                                <button className="p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="Start video call"><Video className="w-5 h-5" /></button>
+                                <button className="p-2 hover:bg-gray-50 rounded-full transition-colors" aria-label="More options"><MoreHorizontal className="w-5 h-5" /></button>
                             </div>
                         </div>
 

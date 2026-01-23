@@ -115,7 +115,9 @@ export function ProjectPhaseStepper({
         <div
           className="absolute top-[58px] left-0 h-3 bg-[#10B981] rounded-full -z-10 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all duration-1000"
           style={{
-            width: `${(phases.filter(p => p.status === 'completed').length / (phases.length - 1)) * 100}%`
+            width: phases.length > 1
+              ? `${(phases.filter(p => p.status === 'completed').length / (phases.length - 1)) * 100}%`
+              : phases[0]?.status === 'completed' ? '100%' : '0%'
           }}
         ></div>
 
